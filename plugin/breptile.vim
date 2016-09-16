@@ -22,10 +22,15 @@ endif
 "-----------------------------------------------------------------------------
 " TmuxSend commands {{{
 function! TmuxSend(text, pane)
-    " Append a carriage return so command gets entered in other pane
-    if a:text[-1] != "\<CR>"
-        let l:text = a:text . "\<CR>"
+    " " Append a carriage return so command gets entered in other pane
+    if a:text[-1] !~ '\(\r\|\n\)' 
+        let l:text = a:text . "\n"
+    else
+        let l:text = a:text
     endif
+
+    echom 'a:text[-1] = ' . a:text[-1]
+    echom l:text
 
     call s:WriteBufFile(l:text)
 
@@ -48,13 +53,13 @@ function! s:WriteBufFile(text)
 endfunction
 "}}}
 " BreptileGetConfig {{{
-function! s:BreptileGetConfig(tpgrep_pat)
+function! s:BReptileGetConfig()
     if exists("b:breptile_tmuxpane") || !b:breptile_tmuxpane
         return
     endif
 
     " Find appropriate program's pane
-    call s:FindProgramPane(a:tpgrep_pat)
+    call s:FindProgramPane(b:tpgrep_pat)
 
     if exists("g:breptile_default_tmuxpane") && !b:breptile_tmuxpane
         let b:breptile_tmuxpane = g:breptile_default_tmuxpane
@@ -85,6 +90,53 @@ function! s:FindProgramPane(tpgrep_pat)
     endif
 endfunction
 "}}}
+" s:BReptileOperator function {{{
+function! s:BReptileOperator(type)
+    let save_reg = @@
+
+    call s:BReptileGetConfig()
+
+    " copy motion for type
+    if a:type ==# 'v'
+        silent execute "normal! `<v`>y"
+    elseif a:type ==# 'V'
+        silent execute "normal! '<V'>y"
+    elseif a:type ==# 'char'
+        silent execute "normal! `[v`]y"
+    else
+        " ignore block-visual '' 
+        return
+    endif
+
+    let mcom = @@
+
+    " NOTE: For some reason, an extra carriage return gets transmitted when
+    " running a single line vs. multiple line selection
+    " if a:type ==# 'V'
+    "     let mcom = mcom[:-2]
+    " endif
+
+    let mcom = substitute(mcom, ';', '; ', 'g')
+    let mcom = substitute(mcom, '%', '\%', 'g')
+    let mcom = substitute(mcom, '#', '\#', 'g')
+    " TODO Figure out how to deal with newline characters in Visual selection!!
+    let mcom = substitute(mcom, "\n", "\<CR>", 'g')
+
+    " Call shellescape() for proper treatment of string characters
+    echom mcom
+    " call system('ts -t ''' . b:breptile_tmuxpane . ''' ' . shellescape(mcom))
+    call system('tmux send-keys -t ''' . b:breptile_tmuxpane . ''' ' . shellescape(mcom))
+    call system('tmux send-keys -t ''' . b:breptile_tmuxpane . ''' C-m')
+
+    " Send literal string to tmux
+    " call TmuxSend(mcom, b:breptile_tmuxpane)
+
+    let @@ = save_reg
+endfunction
+"}}}
+
+nnoremap <silent> <Leader>e :set operatorfunc=<SID>BReptileOperator<CR>g@
+vnoremap <silent> <Leader>e :<C-u>call <SID>BReptileOperator(visualmode())<CR>
 
 let g:loaded_gnuplotvim = 1
 "=============================================================================

@@ -3,7 +3,7 @@
 "  Created: 09/14/2016, 16:11
 "   Author: Bernie Roesler
 "
-"  Description: 
+"  Description: Buffer settings for gnuplot files
 "
 "=============================================================================
 " Buffer-local settings {{{
@@ -23,5 +23,6 @@ setlocal foldignore=
 setlocal foldminlines=3
 
 setlocal nowrap
+"}}}
 "=============================================================================
 "=============================================================================

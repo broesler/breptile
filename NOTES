@@ -1,8 +1,8 @@
 " Keep buffer-local dictionary 
 " vim: set ft=vim
-let b:breptile_config = {"tmux_pane": "left",
-                         "get_errors": 1,
-                         "error_prg": '',}
+let b:breptile_default_config = {"tmux_pane": "left",
+            \   "get_errors": 1,
+            \   "error_prg": '',}
 
 " Two options for each program (filetype):
 " 1. Run entire script
@@ -27,3 +27,5 @@ let b:breptile_config = {"tmux_pane": "left",
 "   ./filename.py
 "
 " For all: need to cd into proper folder to run
+"
+" Need to be able to set defaults (g:...) in ~/.vimrc
