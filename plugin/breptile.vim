@@ -137,8 +137,8 @@ noremap <SID>SendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
 noremap <script> <silent> <Plug>BReptileSendOpNorm <SID>SendOpNorm
 noremap <script> <silent> <Plug>BReptileSendOpVis  <SID>SendOpVis
 
-nnoremap <silent> <Leader>e <Plug>BReptileSendOpNorm
-vnoremap <silent> <Leader>e <Plug>BReptileSendOpVis
+nmap <silent> <Leader>e <Plug>BReptileSendOpNorm
+vmap <silent> <Leader>e <Plug>BReptileSendOpVis
 
 " nnoremap <silent> <Leader>e :set operatorfunc=<SID>SendOp<CR>g@
 " vnoremap <silent> <Leader>e :<C-u>call <SID>SendOp(visualmode())<CR>
