@@ -21,26 +21,30 @@ endif
 "       Tmux  
 "-----------------------------------------------------------------------------
 " TmuxSend commands {{{
-function! TmuxSend(text, pane)
+function! TmuxSend(pane, text)
     " " Append a carriage return so command gets entered in other pane
-    if a:text[-1] !~ '\(\r\|\n\)' 
-        let l:text = a:text . "\n"
-    else
-        let l:text = a:text
-    endif
+    " if a:text[-1] !~ '\(\r\|\n\)' 
+    "     let l:text = a:text . "\n"
+    " else
+    "     let l:text = a:text
+    " endif
+    "
+    " echom 'a:text[-1] = ' . a:text[-1]
+    " echom l:text
 
-    echom 'a:text[-1] = ' . a:text[-1]
-    echom l:text
+    " Send command and carriage return
+    call system('tmux send-keys -t ''' . a:pane . ''' -l ' . shellescape(a:text) .
+           \ '&& tmux send-keys -t ''' . a:pane . ''' C-m')
 
-    call s:WriteBufFile(l:text)
-
-    let l:syscom = "tmux load-buffer " . shellescape(g:buf_file) 
-    call system(l:syscom)
-
-    let l:syscom = "tmux paste-buffer -d -t " . shellescape(a:pane) 
-    call system(l:syscom)
-
-    call system("rm -f " . shellescape(g:buf_file))
+    " call s:WriteBufFile(l:text)
+    "
+    " let l:syscom = "tmux load-buffer " . shellescape(g:buf_file) 
+    " call system(l:syscom)
+    "
+    " let l:syscom = "tmux paste-buffer -d -t " . shellescape(a:pane) 
+    " call system(l:syscom)
+    "
+    " call system("rm -f " . shellescape(g:buf_file))
 endfunction
 "}}}
 
@@ -53,8 +57,8 @@ function! s:WriteBufFile(text)
 endfunction
 "}}}
 " BreptileGetConfig {{{
-function! s:BReptileGetConfig()
-    if exists("b:breptile_tmuxpane") || !b:breptile_tmuxpane
+function! s:GetConfig()
+    if exists("b:breptile_tmuxpane") && !b:breptile_tmuxpane
         return
     endif
 
@@ -65,6 +69,18 @@ function! s:BReptileGetConfig()
         let b:breptile_tmuxpane = g:breptile_default_tmuxpane
         return
     endif
+endfunction
+"}}}
+" EscapeText {{{
+function! s:EscapeText(text)
+    let l:text = a:text
+    let l:text = substitute(l:text, ';', '; ', 'g')
+    let l:text = substitute(l:text, '%', '\%', 'g')
+    " TODO Figure out how to deal with extra newline characters in 
+    " Visual selection!!
+    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
+
+    return l:text
 endfunction
 "}}}
 " FindProgramPane of command {{{
@@ -90,11 +106,11 @@ function! s:FindProgramPane(tpgrep_pat)
     endif
 endfunction
 "}}}
-" s:BReptileOperator function {{{
-function! s:BReptileOperator(type)
+" s:SendOp function {{{
+function! s:SendOp(type)
     let save_reg = @@
 
-    call s:BReptileGetConfig()
+    call s:GetConfig()
 
     " copy motion for type
     if a:type ==# 'v'
@@ -108,35 +124,44 @@ function! s:BReptileOperator(type)
         return
     endif
 
-    let mcom = @@
-
-    " NOTE: For some reason, an extra carriage return gets transmitted when
-    " running a single line vs. multiple line selection
-    " if a:type ==# 'V'
-    "     let mcom = mcom[:-2]
-    " endif
-
-    let mcom = substitute(mcom, ';', '; ', 'g')
-    let mcom = substitute(mcom, '%', '\%', 'g')
-    let mcom = substitute(mcom, '#', '\#', 'g')
-    " TODO Figure out how to deal with newline characters in Visual selection!!
-    let mcom = substitute(mcom, "\n", "\<CR>", 'g')
-
-    " Call shellescape() for proper treatment of string characters
-    echom mcom
-    " call system('ts -t ''' . b:breptile_tmuxpane . ''' ' . shellescape(mcom))
-    call system('tmux send-keys -t ''' . b:breptile_tmuxpane . ''' ' . shellescape(mcom))
-    call system('tmux send-keys -t ''' . b:breptile_tmuxpane . ''' C-m')
-
-    " Send literal string to tmux
-    " call TmuxSend(mcom, b:breptile_tmuxpane)
+    " Send string to tmux 
+    call TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
 
     let @@ = save_reg
 endfunction
-"}}}
 
-nnoremap <silent> <Leader>e :set operatorfunc=<SID>BReptileOperator<CR>g@
-vnoremap <silent> <Leader>e :<C-u>call <SID>BReptileOperator(visualmode())<CR>
+" Create <Plug> for user mappings
+noremap <SID>SendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
+noremap <SID>SendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
+
+noremap <script> <silent> <Plug>BReptileSendOpNorm <SID>SendOpNorm
+noremap <script> <silent> <Plug>BReptileSendOpVis  <SID>SendOpVis
+
+nnoremap <silent> <Leader>e <Plug>BReptileSendOpNorm
+vnoremap <silent> <Leader>e <Plug>BReptileSendOpVis
+
+" nnoremap <silent> <Leader>e :set operatorfunc=<SID>SendOp<CR>g@
+" vnoremap <silent> <Leader>e :<C-u>call <SID>SendOp(visualmode())<CR>
+"}}}
+" s:SendRange function {{{
+function! s:SendRange() range
+    let save_reg = @@
+
+    call s:GetConfig()
+
+    " Copy the text
+    silent execute a:firstline . ',' . a:lastline . 'y'
+
+    " Send string to tmux 
+    call TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+
+    let @@ = save_reg
+endfunction
+
+" User command
+command -range -bar -nargs=0 BReptileSendRange <line1>,<line2>call s:SendRange()
+" }}}
+
 
 let g:loaded_gnuplotvim = 1
 "=============================================================================
