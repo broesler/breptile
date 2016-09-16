@@ -31,12 +31,16 @@ if !exists("g:gnuplot_geterrors")
     let g:gnuplot_geterrors = 0
 endif
 
+" Search pattern for gnuplot pane
+if !exists("b:tpgrep_pat")
+    let b:tpgrep_pat = 'gnuplot'
+endif
+
 if exists("g:gnuplot_pane")
     let b:breptile_tmuxpane = g:gnuplot_pane
 endif
 
 function! GnuplotRunFile()
-    silent !clear
     " Error looks like:
     "   set itle 'Simple Plots'
     "       ^
@@ -48,34 +52,33 @@ function! GnuplotRunFile()
 endfunction
 nnoremap <buffer> <localleader>M :call GnuplotRunFile()<CR>
 
-" Macros for running gnuplot in tmux {{{
-" TODO give 'pat' as argument
-function! FindGnuplotPane()
-    " if we are running tmux...
-    if strlen($TMUX) > 0 
-        " system() returns a list, so strip the trailing newline (only take up to
-        " the 2nd to last character)
-        let g:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
-
-        " Only search for Gnuplot in this session
-        " TODO add variable to determine whether to send commands to another,
-        " already-running Gnuplot session or not (i.e. g:send_tmux_cmds=0 or 1)
-        let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} gnuplot'"
-        let l:sys_com = system('tpgrep -t ' . g:tmux_window . " " . l:pat)
-        let g:gnuplot_pane = substitute(l:sys_com, "\n",'','g') 
-
-        " Error checking
-        if g:gnuplot_pane[:4] ==# "Usage"
-            let g:gnuplot_pane = ''
-            echoe "Gnuplot not found!"
-        endif
-    else 
-        let g:gnuplot_pane = '' 
-    endif
-endfunction
-command! FindGnuplotPane :call FindGnuplotPane()
-
-"}}}--------------------------------------------------------------------------
+" " Macros for running gnuplot in tmux {{{
+" " TODO give 'pat' as argument
+" function! FindGnuplotPane()
+"     if we are running tmux...
+"     if strlen($TMUX) > 0 
+"         system() returns a list, so strip the trailing newline (only take up to
+"         the 2nd to last character)
+"         let g:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
+"
+"         Only search for Gnuplot in this session
+"         TODO add variable to determine whether to send commands to another,
+"         already-running Gnuplot session or not (i.e. g:send_tmux_cmds=0 or 1)
+"         let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} gnuplot'"
+"         let l:sys_com = system('tpgrep -t ' . g:tmux_window . " " . l:pat)
+"         let g:gnuplot_pane = substitute(l:sys_com, "\n",'','g') 
+"
+"         Error checking
+"         if g:gnuplot_pane[:4] ==# "Usage"
+"             let g:gnuplot_pane = ''
+"             echoe "Gnuplot not found!"
+"         endif
+"     else 
+"         let g:gnuplot_pane = '' 
+"     endif
+" endfunction
+" command! FindGnuplotPane :call FindGnuplotPane()
+" " }}}--------------------------------------------------------------------------
 " "       RunGnuplotScript in interactive window {{{
 " "-----------------------------------------------------------------------------
 " function! RunGnuplotScript()
@@ -112,7 +115,7 @@ command! FindGnuplotPane :call FindGnuplotPane()
 " " command! -range EvaluateSelection :call s:EvaluateSelection()
 "
 " "}}}--------------------------------------------------------------------------
-" "       Keymaps
+" "       Keymaps {{{
 " "-----------------------------------------------------------------------------
 " " nnoremap <Leader>M   :update<bar>silent! make!<bar>redraw!<CR>
 " nnoremap <Leader>M   :RunGnuplotScript<CR>
@@ -121,6 +124,7 @@ command! FindGnuplotPane :call FindGnuplotPane()
 " " vnoremap <Leader>e :EvaluateSelection<CR>
 " " vnoremap <Leader>e "ry :call EvaluateSelection(@r)<CR>
 " vnoremap <Leader>e "ry :EvaluateSelection @r <CR>
+"}}}
 
 let g:loaded_gnuplotvim = 1
 "=============================================================================
