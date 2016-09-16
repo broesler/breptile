@@ -1,0 +1,29 @@
+" Keep buffer-local dictionary 
+" vim: set ft=vim
+let b:breptile_config = {"tmux_pane": "left",
+                         "get_errors": 1,
+                         "error_prg": '',}
+
+" Two options for each program (filetype):
+" 1. Run entire script
+" 2. Run just the selected lines/operator lines
+"
+" No error reporting on just selected lines... use BReptile to send text to tmux
+"
+" Need to use :make + filter for error reporting for each function
+"
+" Matlab:
+"   >> %:t:r (i.e. 'filename.m' => 'filename')
+"
+" Gnuplot:
+"   gnuplot -p 'filename.gpi'
+"   OR
+"   gnuplot> load 'filename.gpi'
+"
+" Bash:
+"   ./filename.sh
+"
+" Python:
+"   ./filename.py
+"
+" For all: need to cd into proper folder to run
