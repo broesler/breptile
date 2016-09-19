@@ -11,52 +11,21 @@
 " endif
 
 "-----------------------------------------------------------------------------
-"       Configuration 
-"-----------------------------------------------------------------------------
-if !exists("g:buf_file")
-    let g:buf_file = '/tmp/breptile_paste.txt'
-endif
-
-"-----------------------------------------------------------------------------
 "       Tmux  
 "-----------------------------------------------------------------------------
 " TmuxSend commands {{{
-function! TmuxSend(pane, text)
-    " " Append a carriage return so command gets entered in other pane
-    " if a:text[-1] !~ '\(\r\|\n\)' 
-    "     let l:text = a:text . "\n"
-    " else
-    "     let l:text = a:text
-    " endif
-    "
-    " echom 'a:text[-1] = ' . a:text[-1]
-    " echom l:text
-
+function! s:TmuxSend(pane, text)
     " Send command and carriage return
     call system('tmux send-keys -t ''' . a:pane . ''' -l ' . shellescape(a:text) .
            \ '&& tmux send-keys -t ''' . a:pane . ''' C-m')
 
-    " call s:WriteBufFile(l:text)
-    "
-    " let l:syscom = "tmux load-buffer " . shellescape(g:buf_file) 
-    " call system(l:syscom)
-    "
-    " let l:syscom = "tmux paste-buffer -d -t " . shellescape(a:pane) 
-    " call system(l:syscom)
-    "
-    " call system("rm -f " . shellescape(g:buf_file))
 endfunction
 "}}}
 
 "-----------------------------------------------------------------------------
 "       Utilities 
 "-----------------------------------------------------------------------------
-" WritePasteFile of commands {{{
-function! s:WriteBufFile(text)
-    call system("cat > " . g:buf_file, a:text)
-endfunction
-"}}}
-" BreptileGetConfig {{{
+" s:GetConfig {{{
 function! s:GetConfig()
     if exists("b:breptile_tmuxpane") && !b:breptile_tmuxpane
         return
@@ -65,25 +34,10 @@ function! s:GetConfig()
     " Find appropriate program's pane
     call s:FindProgramPane(b:tpgrep_pat)
 
-    if exists("g:breptile_default_tmuxpane") && !b:breptile_tmuxpane
-        let b:breptile_tmuxpane = g:breptile_default_tmuxpane
-        return
     endif
 endfunction
 "}}}
-" EscapeText {{{
-function! s:EscapeText(text)
-    let l:text = a:text
-    let l:text = substitute(l:text, ';', '; ', 'g')
-    let l:text = substitute(l:text, '%', '\%', 'g')
-    " TODO Figure out how to deal with extra newline characters in 
-    " Visual selection!!
-    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
-
-    return l:text
-endfunction
-"}}}
-" FindProgramPane of command {{{
+" s:FindProgramPane {{{
 function! s:FindProgramPane(tpgrep_pat)
     " Check if we are running tmux
     if strlen($TMUX) > 0 
@@ -106,6 +60,18 @@ function! s:FindProgramPane(tpgrep_pat)
     endif
 endfunction
 "}}}
+" EscapeText {{{
+function! s:EscapeText(text)
+    let l:text = a:text
+    let l:text = substitute(l:text, ';', '; ', 'g')
+    let l:text = substitute(l:text, '%', '\%', 'g')
+    " TODO Figure out how to deal with extra newline characters in 
+    " Visual selection!!
+    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
+
+    return l:text
+endfunction
+"}}}
 " s:SendOp function {{{
 function! s:SendOp(type)
     let save_reg = @@
@@ -125,7 +91,7 @@ function! s:SendOp(type)
     endif
 
     " Send string to tmux 
-    call TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
 
     let @@ = save_reg
 endfunction
@@ -153,7 +119,7 @@ function! s:SendRange() range
     silent execute a:firstline . ',' . a:lastline . 'y'
 
     " Send string to tmux 
-    call TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
 
     let @@ = save_reg
 endfunction
