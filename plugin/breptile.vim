@@ -6,14 +6,18 @@
 "  Description: Functions for running commands/scripts in any tmux pane
 "
 "=============================================================================
-" if exists('g:loaded_breptile') || &cp
+" if exists("g:loaded_breptile") || &cp
 "   finish
 " endif
+
+if !exists("g:breptile_mapkeys")
+    let g:breptile_mapkeys = 1
+endif
 
 "-----------------------------------------------------------------------------
 "       Tmux  
 "-----------------------------------------------------------------------------
-" TmuxSend commands {{{
+" s:TmuxSend {{{
 function! s:TmuxSend(pane, text)
     " Send command and carriage return
     call system('tmux send-keys -t ''' . a:pane . ''' -l ' . shellescape(a:text) .
@@ -23,7 +27,7 @@ endfunction
 "}}}
 
 "-----------------------------------------------------------------------------
-"       Utilities 
+"       Functions
 "-----------------------------------------------------------------------------
 " s:GetConfig {{{
 function! s:GetConfig()
@@ -31,9 +35,14 @@ function! s:GetConfig()
         return
     endif
 
-    " Find appropriate program's pane
-    call s:FindProgramPane(b:tpgrep_pat)
-
+    if exists("b:tpgrep_pat") && !b:tpgrep_pat
+        " Find appropriate program's pane
+        call s:FindProgramPane(b:tpgrep_pat)
+    else
+        echohl WarningMsg 
+              \| echom "WARNING: Program is not running!\n"
+              \ . "Please choose b:breptile_tmuxpane or set b:tpgrep_pat."
+              \| echohl None
     endif
 endfunction
 "}}}
@@ -60,7 +69,7 @@ function! s:FindProgramPane(tpgrep_pat)
     endif
 endfunction
 "}}}
-" EscapeText {{{
+" s:EscapeText {{{
 function! s:EscapeText(text)
     let l:text = a:text
     let l:text = substitute(l:text, ';', '; ', 'g')
@@ -74,9 +83,8 @@ endfunction
 "}}}
 " s:SendOp function {{{
 function! s:SendOp(type)
-    let save_reg = @@
-
     call s:GetConfig()
+    let save_reg = @@
 
     " copy motion for type
     if a:type ==# 'v'
@@ -90,44 +98,48 @@ function! s:SendOp(type)
         return
     endif
 
-    " Send string to tmux 
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
 
     let @@ = save_reg
 endfunction
 
 " Create <Plug> for user mappings
-noremap <SID>SendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
-noremap <SID>SendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
+noremap <script> <silent> <Plug>BReptileSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
+noremap <script> <silent> <Plug>BReptileSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
 
-noremap <script> <silent> <Plug>BReptileSendOpNorm <SID>SendOpNorm
-noremap <script> <silent> <Plug>BReptileSendOpVis  <SID>SendOpVis
-
-nmap <silent> <Leader>e <Plug>BReptileSendOpNorm
-vmap <silent> <Leader>e <Plug>BReptileSendOpVis
-
-" nnoremap <silent> <Leader>e :set operatorfunc=<SID>SendOp<CR>g@
-" vnoremap <silent> <Leader>e :<C-u>call <SID>SendOp(visualmode())<CR>
 "}}}
 " s:SendRange function {{{
 function! s:SendRange() range
-    let save_reg = @@
-
     call s:GetConfig()
-
-    " Copy the text
+    let save_reg = @@
     silent execute a:firstline . ',' . a:lastline . 'y'
-
-    " Send string to tmux 
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
-
     let @@ = save_reg
 endfunction
 
-" User command
-command -range -bar -nargs=0 BReptileSendRange <line1>,<line2>call s:SendRange()
+command! -range -bar BReptileSendRange <line1>,<line2>call s:SendRange()
+" }}}
+" s:SendCount {{{
+function! s:SendCount(count)
+    call s:GetConfig()
+    let save_reg = @@
+    silent execute 'normal! ' . a:count . 'yy'
+    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    let @@ = save_reg
+endfunction
+
+command! -count BReptileSendCount call s:SendCount(<count>)
 " }}}
 
+"-----------------------------------------------------------------------------
+"       Map keys 
+"-----------------------------------------------------------------------------
+" User uses these maps in their vimrc:
+if g:breptile_mapkeys
+    " ALLOW recursion here so that <Plug>s work properly
+    nmap <silent> <Leader>e <Plug>BReptileSendOpNorm
+    vmap <silent> <Leader>e <Plug>BReptileSendOpVis
+endif
 
 let g:loaded_gnuplotvim = 1
 "=============================================================================
