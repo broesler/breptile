@@ -6,7 +6,7 @@
 "  Description: Functions for running commands/scripts in any tmux pane
 "
 "=============================================================================
-" if exists("g:loaded_breptile") || &cp
+" if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
 "   finish
 " endif
 
@@ -110,6 +110,7 @@ function! s:SendOp(type) abort "{{{
         silent execute "normal! `<v`>y"
     elseif a:type ==# 'V'
         silent execute "normal! '<V'>y"
+        let @@ = @@[:-2]    " remove repeated newline
     elseif a:type ==# 'char'
         silent execute "normal! `[v`]y"
     else
@@ -137,7 +138,6 @@ function! s:SendRange() range abort "{{{
     let @@ = save_reg
 endfunction
 
-command! -range -bar BReptileSendRange <line1>,<line2>call s:SendRange()
 " }}}
 function! s:SendCount(count) abort "{{{
     if !s:GetConfig()
@@ -149,14 +149,15 @@ function! s:SendCount(count) abort "{{{
     let @@ = save_reg
 endfunction
 
-command! -count BReptileSendCount call s:SendCount(<count>)
 " }}}
 
 "-----------------------------------------------------------------------------
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
 " Allow user to manually search for pane
-command! -nargs=? BReptileFindPane call s:UpdateProgramPane(<f-args>)
+command! -nargs=?    BReptileFindPane   call s:UpdateProgramPane(<f-args>)
+command! -count      BReptileSendCount  call s:SendCount(<count>)
+command! -range -bar BReptileSendRange  <line1>,<line2>call s:SendRange()
 
 " User uses these maps in their vimrc:
 if g:breptile_mapkeys
