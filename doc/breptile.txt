@@ -11,6 +11,7 @@ Whenever you edit a file in a tmux session, a set of commands is defined that
 serve as a gateway to a neighboring tmux pane. Additional functionality is
 available based on filetype.
 
+USAGE 						*breptile-usage*
 COMMANDS                                        *breptile-commands*
 
 These commands are local to the buffers in which they work.
@@ -29,4 +30,57 @@ These commands are local to the buffers in which they work.
 :[range]BReptileSendRange
 			Send {range} lines to REPL program.
 
-vim:tw=78:ts=8:noet:ft=help:norl:
+MAPPINGS					*breptile-mappings*
+
+CONFIGURATION					*breptile-configuration*
+
+BUGS 						*breptile-bugs*
+	-- In gnuplot, trouble with single quotes followed by a newline, but
+	only when the single quoted line is in the middle of other lines, i.e.
+		set title 'Simple Plots'
+		set title  font "Times,20" norotate
+	will work, giving this gnuplot output (in other tmux pane):
+		gnuplot> set title 'Simple Plots'
+		set title  font "Times,20" norotate
+		gnuplot> set title  font "Times,20" norotate
+		gnuplot>
+	These commands:
+		set samples 500, 500
+		set title 'Simple Plots'
+		set title  font "Times,20" norotate
+	however, will give an error:
+		gnuplot> set samples 500, 500
+		set title 'Simple Plots'
+		set title  font "Times,20" norotate
+		gnuplot> set title 'Simple Plots'set title  font "Times,20" norotate
+		                                 ^
+		         unexpected or unrecognized token
+		
+		gnuplot>
+	The same issue occurs whether using "<Leader>e2j" or "V2j<Leader>e" (and
+	vice versa with the working lines of code).
+	The following carriage return does not get parsed properly. 
+	
+	In general, we need to double quote the vim string that we pass to
+	shellescape(), so that single quotes get properly escaped, i.e. 
+		:echom shellescape('test') 
+			'test'
+		:echom shellescape("'test'") 
+			'\'''test'\''' 
+	We need to use single quotes around the "keystrokes" string, however, so
+	that shell expansion does not occur when we send the string to tmux:
+		$ test=hi
+		$ tmux send-keys -t left -l 'echo $test'
+		[left] 	$ echo $test
+		$ tmux send-keys -t left -l "echo $test"
+		[left] 	$ echo hi
+
+CHANGELOG					*breptile-changelog*
+
+CONTRIBUTING					*breptile-contributing*
+
+CREDITS 					*breptile-credits*
+I owe significant thanks to Steve Losh's "Learn Vimscript the Hard Way"
+<http://learnvimscriptthehardway.stevelosh.com/>
+
+vim:tw=78:ts=8:noet:ft=text:norl:

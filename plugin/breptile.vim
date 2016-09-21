@@ -21,14 +21,14 @@ if !exists("g:breptile_usetpgrep")
     let g:breptile_usetpgrep = 0
 endif
 
-
 "-----------------------------------------------------------------------------
 "       Functions
 "-----------------------------------------------------------------------------
 function! s:TmuxSend(pane, text) abort "{{{
-    " Send command and carriage return
-    call system('tmux send-keys -t ''' . a:pane . ''' -l ' . shellescape(a:text) .
-           \ '&& tmux send-keys -t ''' . a:pane . ''' C-m')
+    " Send command literally, and then send carriage return keystroke
+    let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
+    let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
+    call system(litkeys . ' && ' . creturn)
 endfunction
 "}}}
 function! s:GetConfig() abort "{{{
@@ -90,10 +90,9 @@ endfunction
 " }}}
 function! s:EscapeText(text) abort "{{{
     let l:text = a:text
-    let l:text = substitute(l:text, ';', '; ', 'g')
+    " may only need for matlab:
+    " let l:text = substitute(l:text, ';', '; ', 'g') 
     let l:text = substitute(l:text, '%', '\%', 'g')
-    " TODO Figure out how to deal with extra newline characters in 
-    " Visual selection!!
     let l:text = substitute(l:text, "\n", "\<CR>", 'g')
 
     return l:text
@@ -103,24 +102,30 @@ function! s:SendOp(type) abort "{{{
     if !s:GetConfig()
         return
     endif
-    let save_reg = @@
 
-    " copy motion for type
-    if a:type ==# 'v'
-        silent execute "normal! `<v`>y"
-    elseif a:type ==# 'V'
-        silent execute "normal! '<V'>y"
-        let @@ = @@[:-2]    " remove repeated newline
+    " Selection needs to include start and end points 
+    let sel_save = &selection
+    let &selection = "inclusive"
+    " function will wipe out unnamed register, so save its contents
+    let reg_save = @@
+
+    " copy motion for type (see :help g@)
+    if (a:type ==# 'v') || (a:type ==# 'V')
+        silent execute "normal! gvy"
     elseif a:type ==# 'char'
         silent execute "normal! `[v`]y"
+    elseif a:type ==# 'line'
+        silent execute "norma! '[V']y"
     else
         " ignore block-visual '' 
-        return
+        return  
     endif
 
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
 
-    let @@ = save_reg
+    " Return selection and unnamed register to previous values
+    let &selection = sel_save
+    let @@ = reg_save
 endfunction
 
 " Create <Plug> for user mappings
@@ -132,10 +137,10 @@ function! s:SendRange() range abort "{{{
     if !s:GetConfig()
         return
     endif
-    let save_reg = @@
+    let reg_save = @@
     silent execute a:firstline . ',' . a:lastline . 'y'
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
-    let @@ = save_reg
+    let @@ = reg_save
 endfunction
 
 " }}}
@@ -143,10 +148,10 @@ function! s:SendCount(count) abort "{{{
     if !s:GetConfig()
         return
     endif
-    let save_reg = @@
+    let reg_save = @@
     silent execute 'normal! ' . a:count . 'yy'
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
-    let @@ = save_reg
+    let @@ = reg_save
 endfunction
 
 " }}}

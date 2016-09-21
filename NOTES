@@ -1,31 +1,45 @@
-" Keep buffer-local dictionary 
-" vim: set ft=vim
-let b:breptile_default_config = {"tmux_pane": "left",
-            \   "get_errors": 1,
-            \   "error_prg": '',}
+# NOTEs for breptile.vim
 
-" Two options for each program (filetype):
-" 1. Run entire script
-" 2. Run just the selected lines/operator lines
-"
-" No error reporting on just selected lines... use BReptile to send text to tmux
-"
-" Need to use :make + filter for error reporting for each function
-"
-" Matlab:
-"   >> %:t:r (i.e. 'filename.m' => 'filename')
-"
-" Gnuplot:
-"   gnuplot -p 'filename.gpi'
-"   OR
-"   gnuplot> load 'filename.gpi'
-"
-" Bash:
-"   ./filename.sh
-"
-" Python:
-"   ./filename.py
-"
-" For all: need to cd into proper folder to run
-"
-" Need to be able to set defaults (g:...) in ~/.vimrc
+Two options for each program (filetype):
+1. Run entire script
+2. Run just the selected lines/operator lines --> already functioning!!
+
+No error reporting on just selected lines... use BReptile to send text to tmux
+
+	-- Need to use :make + filter for error reporting for each function
+	-- Can generalize "RunScript" function (and its mapping), and just pass
+	   b:makeprg and b:errorformat for each filetype
+	-- IDEA: separate "RunScript" and "GetErrors" functions! Allows for
+	   long-running scripts, no hacks to wait for script to finish
+	-- just use "tmux capture-pane -p -t . b:breptile_tmuxpane" to get
+	   output, then choose option: 
+		1. write vimscript to filter just most recent output, write
+		   to errorfile, read in via ":cgetfile". This option doesn't
+		   actually call ":make" ever, and is probably the most portable
+		   since it does not rely on bash other than for the tmux
+		   command (which we're assuming the user is already running!).
+		   It does, however, require writing a temp file which could
+		   introduce some portability issues.
+		2. write bash script to output just most recent output in same
+		   pane as vim (bash script will call tmux capture-pane), run
+		   ":make myfilter" to get those errors into a quickfix list
+	-- either way, 
+
+Matlab:
+  >> %:t:r (i.e. 'filename.m' => 'filename')
+
+Gnuplot:
+  gnuplot -p 'filename.gpi'
+  OR
+  gnuplot> load 'filename.gpi'
+
+Bash:
+  ./filename.sh
+
+Python:
+  ./filename.py
+
+For all: need to cd into proper folder to run
+
+Need to be able to set defaults (g:...) in ~/.vimrc
+# vim: set ft=text :
