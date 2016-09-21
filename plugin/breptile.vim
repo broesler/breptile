@@ -36,8 +36,10 @@ function! s:TmuxSend(pane, text) abort "{{{
         let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(piece)
         echom litkeys
         call system(litkeys)
+        sleep 1
         echom creturn
         call system(creturn)
+        sleep 1
     endfor
     " Send command literally, and then send carriage return keystroke
     " let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
