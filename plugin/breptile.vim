@@ -25,10 +25,24 @@ endif
 "       Functions
 "-----------------------------------------------------------------------------
 function! s:TmuxSend(pane, text) abort "{{{
-    " Send command literally, and then send carriage return keystroke
-    let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
+    " Split string into each line
+    let pieces = split(a:text, "\n")
+    echo pieces
+
     let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
-    call system(litkeys . ' && ' . creturn)
+
+    for piece in pieces
+        echom piece
+        let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(piece)
+        echom litkeys
+        call system(litkeys)
+        echom creturn
+        call system(creturn)
+    endfor
+    " Send command literally, and then send carriage return keystroke
+    " let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
+    " let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
+    " call system(litkeys . ' && ' . creturn)
 endfunction
 "}}}
 function! s:GetConfig() abort "{{{
@@ -93,7 +107,7 @@ function! s:EscapeText(text) abort "{{{
     " may only need for matlab:
     " let l:text = substitute(l:text, ';', '; ', 'g') 
     let l:text = substitute(l:text, '%', '\%', 'g')
-    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
+    " let l:text = substitute(l:text, "\n", "\<CR>", 'g')
 
     return l:text
 endfunction
