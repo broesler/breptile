@@ -35,8 +35,9 @@ MAPPINGS					*breptile-mappings*
 CONFIGURATION					*breptile-configuration*
 
 BUGS 						*breptile-bugs*
-	-- In gnuplot, trouble with single quotes followed by a newline, but
-	only when the single quoted line is in the middle of other lines, i.e.
+	ISSUE [09/21/2016, 15:02]:
+	-- Trouble with single quotes followed by a newline, but only when the
+	single quoted line is in the middle of other lines, i.e.
 		set title 'Simple Plots'
 		set title  font "Times,20" norotate
 	will work, giving this gnuplot output (in other tmux pane):
@@ -60,6 +61,16 @@ BUGS 						*breptile-bugs*
 	The same issue occurs whether using "<Leader>e2j" or "V2j<Leader>e" (and
 	vice versa with the working lines of code).
 	The following carriage return does not get parsed properly. 
+
+	This issue appears to occur only occasionally, and seems to be
+	a vim/shell timing issue. If we include "sleep 1" in the vimscript
+	between each "system()" command (i.e. the literal keys, then the C-m,
+	then the next set of literal keys in the next for-loop iteration, etc.),
+	the problem disappears entirely.
+
+	NOTE: The same problem occurs with "tmux load/paste-buffer". Entire
+	description is posted to a StackOverflow question here
+	<http://stackoverflow.com/questions/39646008/why-does-tmux-not-insert-newlines-when-pasting-a-multi-line-command>
 	
 	In general, we need to double quote the vim string that we pass to
 	shellescape(), so that single quotes get properly escaped, i.e. 
