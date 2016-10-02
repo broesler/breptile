@@ -10,7 +10,7 @@
 "       Macros for running MATLAB in tmux {{{
 "-----------------------------------------------------------------------------
 if !exists("g:matlab_pane")
-  let g:matlab_pane = ''
+  let g:matlab_pane = 'left'
 endif
 
 augroup update
@@ -44,9 +44,9 @@ command! FindMatlabPane :call FindMatlabPane()
 " function! LintAndRunMatlabScript()
 "     let qflist = []       " start with empty error list
 "
-"     " Set errorformat for both lint and Matlab output
+"     " Set &l:errorformat for both lint and Matlab output
 "     " NOTE: each entry must end in a comma for concatenation
-"     let b:efm="%EL %l (C %c%.%#): Parse error%.%#: %m,"
+"     let &l:errorformat="%EL %l (C %c%.%#): Parse error%.%#: %m,"
 "                 \."%EL %l (C %c%.%#): Invalid syntax at '%s'%.%#. %m,"
 "                 \."%WL %l (C %c%.%#): %m,"
 "                 \."%WWarning: %m,%Z> in %f (line %l),"
@@ -55,7 +55,7 @@ command! FindMatlabPane :call FindMatlabPane()
 "                 \."%EError: File: %f Line: %l Column: %c,%Z%m"
 "
 "     " LINT: needs full filename
-"     let b:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint "
+"     let &l:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint "
 "                 \.shellescape(expand("%:p"))
 "                 " \.a:filename.".m"
 "                 " \.shellescape(expand(a:filename))
@@ -81,8 +81,8 @@ command! FindMatlabPane :call FindMatlabPane()
 "         " RUN:
 "         " Choose [r]un [m]atlab [t]mux with current file (no extension)
 "         " Use '-p' flag to echo Matlab output to vim's pane to parse for errors
-"         let b:makeprg="rmt -p ".shellescape(expand("%:t:r"))
-"         " let b:makeprg="rmt -p ".shellescape(expand(a:filename))
+"         let &l:makeprg="rmt -p ".shellescape(expand("%:t:r"))
+"         " let &l:makeprg="rmt -p ".shellescape(expand(a:filename))
 "         silent! make! | redraw!
 "         let qflist += getqflist()
 "     endif
@@ -105,7 +105,7 @@ command! FindMatlabPane :call FindMatlabPane()
 function! LintMatlabScript()
     " TODO make full Matlab path a script variable
     " Use the built-in Matlab lint function
-    " let b:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint "
+    " let &l:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint "
     "             \.shellescape(expand("%:p"))
 
     " Give <filename.m> <filename> to make mlint print filenames
@@ -122,14 +122,14 @@ function! LintMatlabScript()
     " ========== <filename without extension> ==========
     " L 0 (C 0): MDOTM :Filename 'filename' must end in .m or .M
 
-    let b:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint -id "
+    let &l:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint -id "
                 \.shellescape(expand("%:p")).' '.shellescape(expand("%:p:r"))
 
     " List efm most restrictive to least restrictive patterns
-    " let b:efm="%EL %l (C %c%.%#): Parse error%.%#: %m,"
+    " let &l:errorformat="%EL %l (C %c%.%#): Parse error%.%#: %m,"
     "             \."%EL %l (C %c%.%#): Invalid syntax at '%s'%.%#. %m,"
     "             \."%WL %l (C %c%.%#): %m"
-    let b:efm= "%P==========\ %f\ ==========,"
+    let &l:errorformat= "%P==========\ %f\ ==========,"
           \."%-G%>==========\ %s\ ==========,"
           \."%-G%>L\ %l\ (C\ %c):\ MDOTM%m,"
           \."L\ %l\ (C\ %c):\ %m,"
@@ -147,7 +147,7 @@ command! LintMatlabScript :call LintMatlabScript()
 function! RunMatlabScript()
     " Choose [r]un [m]atlab [t]mux with current file (no extension)
     " Use '-p' flag to echo Matlab output to vim's pane to parse for errors
-    " let b:makeprg="rmt -p ".shellescape(expand("%:t:r"))
+    " let &l:makeprg="rmt -p ".shellescape(expand("%:t:r"))
 
     " Check if Matlab is running!
     if strlen(g:matlab_pane) == 0
@@ -157,16 +157,16 @@ function! RunMatlabScript()
         return -1
     end
     
-    " Need to figure out how to escape g:matlab_pane so that makeprg sends the
+    " Need to figure out how to escape g:matlab_pane so that &l:makeprg sends the
     " literal string to the command-line!!
     let mpane = substitute(g:matlab_pane, '%','\\%', 'g')
-    let b:makeprg='ts -t '''.mpane.''' '.shellescape(expand("%:t:r"))
+    let &l:makeprg='ts -t '''.mpane.''' '.shellescape(expand("%:t:r"))
 
-    " NOTE: efm will not do anything with makeprg set to "ts -t..." because
+    " NOTE: efm will not do anything with &l:makeprg set to "ts -t..." because
     " just sending keys to tmux will not report anything back to the vim pane
     "
     " List efm most restrictive to least restrictive patterns
-    let b:efm="%WWarning: %m,%Z> in %f (line %l),"
+    let &l:errorformat="%WWarning: %m,%Z> in %f (line %l),"
                 \."%ZError in %f (line %l),%+EError using%.%#,%C%m,%-G%.%#"
     " \."%EError: File: %f Line: %l Column: %c,%Z%m"
 
@@ -262,19 +262,19 @@ command! Dbstep :call Dbstep()
 "}}}--------------------------------------------------------------------------
 "       Evaluate current selection {{{
 "-----------------------------------------------------------------------------
-function! EvaluateSelection()
-    let mcom = s:GetVisualSelection()
-    " Only need to escape ; if there is no space after it (not sure why?)
-    let mcom = substitute(mcom, ';', '; ', 'g')
-    " Need to escape `%' so vim doesn't insert filename
-    let mcom = substitute(mcom, '%', '\%', 'g')
-    " Change newlines to literal carriage return so shellescape() does not
-    " escape them (sends literal \ to tmux send-keys)
-    let mcom = substitute(mcom, "\n", '\', 'g')
-    " Call shellescape() for proper treatment of string characters
-    call system('ts -t '''.g:matlab_pane.''' '.shellescape(mcom))
-endfunction
-command! -range EvaluateSelection :call EvaluateSelection()
+" function! EvaluateSelection()
+"     let mcom = s:GetVisualSelection()
+"     " Only need to escape ; if there is no space after it (not sure why?)
+"     let mcom = substitute(mcom, ';', '; ', 'g')
+"     " Need to escape `%' so vim doesn't insert filename
+"     let mcom = substitute(mcom, '%', '\%', 'g')
+"     " Change newlines to literal carriage return so shellescape() does not
+"     " escape them (sends literal \ to tmux send-keys)
+"     let mcom = substitute(mcom, "\n", '\\', 'g')
+"     " Call shellescape() for proper treatment of string characters
+"     call system('ts -t '''.g:matlab_pane.''' '.shellescape(mcom))
+" endfunction
+" command! -range EvaluateSelection :call EvaluateSelection()
 
 "}}}--------------------------------------------------------------------------
 "       GetVisualSelection Return string of visual selection {{{
@@ -307,7 +307,7 @@ nnoremap <buffer> <localleader>M :RunMatlabScript<CR>
 nnoremap <buffer> <localleader>L :LintMatlabScript<CR>
 
 " Evaluate Current selection
-vnoremap <localleader>e :EvaluateSelection<CR>
+" vnoremap <buffer> <localleader>e :EvaluateSelection<CR>
 
 " Debugging
 nnoremap <buffer> <localleader>b :Dbstop<CR>
@@ -328,14 +328,17 @@ nnoremap <buffer> <localleader>w :call system('ts -t '''.g:matlab_pane.''' "whod
 nnoremap <buffer> <localleader>W :call system('ts -t '''.g:matlab_pane.''' "whodat"')<CR>
 
 " Just hit "Enter" on a variable to display it in console
-nnoremap <buffer> <localleader> :call system('ts -t '''.g:matlab_pane.''' "<C-R><C-W>"')<CR>
+nnoremap <buffer> <localleader><CR> system('ts -t '''.g:matlab_pane.''' "<C-R><C-W>"')<CR>
 
 " Change matlab directory
 nnoremap <buffer> <localleader>d :CdMatlab<CR>
 
 " Make line into a comment header with dashes
-" let @h='o%79a-yypO%8a '
-let @h='O%79a-jI%8a o%79a-k$'
+augroup headers "{{{
+    au!
+    autocmd BufEnter *.m let @h='O%79a-jI%8a o%79a-k$'
+augroup END
+"}}}
 
 " Following function does NOT work when "comments" is set because newline
 "+ characters insert additional leader character

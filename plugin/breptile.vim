@@ -32,14 +32,13 @@ function! s:TmuxSend(pane, text) abort "{{{
     let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
 
     for piece in pieces
-        echom piece
         let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(piece)
         echom litkeys
         call system(litkeys)
-        sleep 1
+        " sleep 1
         echom creturn
         call system(creturn)
-        sleep 1
+        " sleep 1
     endfor
     " Send command literally, and then send carriage return keystroke
     " let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
@@ -133,7 +132,7 @@ function! s:SendOp(type) abort "{{{
     elseif a:type ==# 'line'
         silent execute "norma! '[V']y"
     else
-        " ignore block-visual '' 
+        " ignore block-visual '<C-v>' 
         return  
     endif
 
