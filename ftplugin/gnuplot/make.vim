@@ -6,7 +6,6 @@
 "  Description: Functions for running gnuplot scripts in the CLI
 "
 "=============================================================================
-
 if !exists("g:gnuplot_defaultoptions")
     let g:gnuplot_defaultoptions = "-p"
 endif
@@ -26,10 +25,9 @@ if exists("g:gnuplot_pane") && g:gnuplot_pane
 endif
 
 " Search pattern for gnuplot pane
-if !exists("b:tpgrep_pat")
-    let b:tpgrep_pat = '[g]nuplot'
-endif
+let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[g]nuplot')
 
+" TODO move this function to a generic breptile function
 function! s:GnuplotRunFile()
     " Error looks like:
     "   set itle 'Simple Plots'
@@ -38,7 +36,8 @@ function! s:GnuplotRunFile()
     let &l:errorformat="%E%p^,%Z\"%f\"\\, line %l:%m"
     let &l:makeprg = g:gnuplot_command . " " . bufname("%")
 
-    write | silent make | redraw!
+    " Don't jump to first error
+    write | silent make! | redraw!
 endfunction
 
 noremap <silent> <Plug>BReptileGnuplotrunfile :<C-u>call <SID>GnuplotRunFile()<CR>

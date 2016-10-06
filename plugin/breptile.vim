@@ -3,7 +3,8 @@
 "  Created: 09/15/2016, 19:26
 "   Author: Bernie Roesler
 "
-"  Description: Functions for running commands/scripts in any tmux pane
+"  Description: Main script for this plugin. Defines functions for running
+"  commands/scripts in any tmux pane (except the one running vim!).
 "
 "=============================================================================
 " if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
@@ -25,25 +26,10 @@ endif
 "       Functions
 "-----------------------------------------------------------------------------
 function! s:TmuxSend(pane, text) abort "{{{
-    " Split string into each line
-    let pieces = split(a:text, "\n")
-    echo pieces
-
-    let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
-
-    for piece in pieces
-        let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(piece)
-        echom litkeys
-        call system(litkeys)
-        " sleep 1
-        echom creturn
-        call system(creturn)
-        " sleep 1
-    endfor
     " Send command literally, and then send carriage return keystroke
-    " let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
-    " let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
-    " call system(litkeys . ' && ' . creturn)
+    let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
+    let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
+    call system(litkeys . ' && ' . creturn)
 endfunction
 "}}}
 function! s:GetConfig() abort "{{{
@@ -106,9 +92,10 @@ endfunction
 function! s:EscapeText(text) abort "{{{
     let l:text = a:text
     " may only need for matlab:
-    " let l:text = substitute(l:text, ';', '; ', 'g') 
+    let l:text = substitute(l:text, ';', '; ', 'g') 
+    " Escape '%' so vim doesn't insert filename
     let l:text = substitute(l:text, '%', '\%', 'g')
-    " let l:text = substitute(l:text, "\n", "\<CR>", 'g')
+    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
 
     return l:text
 endfunction
@@ -142,11 +129,6 @@ function! s:SendOp(type) abort "{{{
     let &selection = sel_save
     let @@ = reg_save
 endfunction
-
-" Create <Plug> for user mappings
-noremap <silent> <Plug>BReptileSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
-noremap <silent> <Plug>BReptileSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
-
 "}}}
 function! s:SendRange() range abort "{{{
     if !s:GetConfig()
@@ -157,7 +139,6 @@ function! s:SendRange() range abort "{{{
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
-
 " }}}
 function! s:SendCount(count) abort "{{{
     if !s:GetConfig()
@@ -168,12 +149,15 @@ function! s:SendCount(count) abort "{{{
     call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
-
 " }}}
 
 "-----------------------------------------------------------------------------
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
+" Create <Plug> for user mappings
+noremap <silent> <Plug>BReptileSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
+noremap <silent> <Plug>BReptileSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
+
 " Allow user to manually search for pane
 command! -nargs=?    BReptileFindPane   call s:UpdateProgramPane(<f-args>)
 command! -count      BReptileSendCount  call s:SendCount(<count>)
