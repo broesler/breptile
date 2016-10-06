@@ -6,27 +6,6 @@
 "  Description: Functions for running gnuplot scripts in the CLI
 "
 "=============================================================================
-if !exists("g:gnuplot_defaultoptions")
-    let g:gnuplot_defaultoptions = "-p"
-endif
-
-if !exists("g:gnuplot_command")
-    if executable('gnuplot')
-        let g:gnuplot_command = "gnuplot"
-    else
-        finish
-    endif
-    let g:gnuplot_command .= " " . g:gnuplot_defaultoptions
-endif
-
-" Directly set pane if it exists and is non-empty
-if exists("g:gnuplot_pane") && g:gnuplot_pane
-    let b:breptile_tmuxpane = g:gnuplot_pane
-endif
-
-" Search pattern for gnuplot pane
-let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[g]nuplot')
-
 " TODO move this function to a generic breptile function
 function! s:GnuplotRunFile()
     " Error looks like:

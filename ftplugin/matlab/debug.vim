@@ -6,6 +6,10 @@
 "  Description: Debugging functions for matlab files
 "
 "=============================================================================
+if exists('g:loaded_breptile_matlab_debug')
+    finish
+endif
+
 " Define signs for debugging stops {{{
 hi clear SignColumn
 hi default DebugStopHL ctermfg=red
@@ -68,6 +72,8 @@ function! matlab#debug#Dbstep() "{{{
     exe ":silent! sign place 1 line=" . lnr . " name=piet file=" . expand("%:p")
 endfunction
 "}}}
+
+let g:loaded_breptile_matlab_debug = 1
 " vim:fdm=marker
 "=============================================================================
 "=============================================================================
