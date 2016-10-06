@@ -8,7 +8,7 @@
 "  Description: MATLAB filetype settings and mappings
 "=============================================================================
 if exists("g:matlab_pane") && g:matlab_pane
-    let b:breptile_tmuxpane = b:breptile_tmuxpane
+    let b:breptile_tmuxpane = g:matlab_pane
 endif
 
 " Search pattern for gnuplot pane
@@ -84,79 +84,16 @@ function! MatlabRunScript() "{{{
 endfunction
 "}}}
 
-" Define signs for debugging stops {{{
-hi clear SignColumn
-hi default DebugStopHL ctermfg=red
-hi link DebugCursorHL Search
-sign define dbstop text=$$ texthl=DebugStopHL
-sign define piet   text=>> texthl=DebugCursorHL
-"}}}
-function! MatlabDbstop() "{{{
-    write %
-    let lnr = line('.')
-    let mcom = "dbstop in " . expand("%") . " at " . lnr
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' ' . mcom)
-    " place sign at dbstop current line, use lnr as ID
-    exe ":silent sign place " . lnr . " line=" . lnr . " name=dbstop file=" . expand("%:p")
-    " keep file from being modified during debugging
-    set noma
-endfunction
-"}}}
-function! MatlabDbclear() "{{{
-    let mcom = "dbclear in " . expand("%") . " at " . line(".")
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' ' . mcom)
-    silent! sign unplace
-endfunction
-"}}}
-function! MatlabDbclearall() "{{{
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' dbclear all')
-    silent! sign unplace *
-    set ma
-endfunction
-"}}}
-function! MatlabDbquit() "{{{
-    " Send dbquit to matlab
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' dbquit')
-
-    " Remove debugging cursor marker
-    silent! sign unplace 1
-
-    " Make file modifiable again
-    set ma
-endfunction
-"}}}
-function! MatlabDbstep() "{{{
-    " Unplace sign at current cursor position
-    silent! sign unplace 1
-
-    " Make debugging step
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' dbstep')
-
-    " Return line on which debugger has stopped
-    "    Read MATLAB window debugger output i.e.:
-    "      37      f1 = f(z(:,:,i));
-    "      K>> dbstep
-    "      38      f2 = f(z(:,:,i)+(h/2)*f1);
-    "      K>>
-    "    and grep for lines starting with numbers, then read last number
-    let lnr = system('tmux capture-pane -p -t ''' . b:breptile_tmuxpane . ''' | grep -o "^\<[0-9]\+\>" | tail -n 1')
-
-    " " move cursor to next line, first column with non-whitespace character
-    " call cursor(lnr,0) | norm! ^
-    exe ":silent! sign place 1 line=" . lnr . " name=piet file=" . expand("%:p")
-endfunction
-"}}}
-
 "-----------------------------------------------------------------------------
 "       Keymaps {{{
 "-----------------------------------------------------------------------------
 command! -buffer -bar MatlabLintScript :call MatlabLintScript()
 command! -buffer -bar MatlabRunScript  :call MatlabRunScript()
-command! -buffer -bar MatlabDbstop     :call MatlabDbstop()
-command! -buffer -bar MatlabDbclear    :call MatlabDbclear()
-command! -buffer -bar MatlabDbclearall :call MatlabDbclearall()
-command! -buffer -bar MatlabDbquit     :call MatlabDbquit()
-command! -buffer -bar MatlabDbstep     :call MatlabDbstep()
+command! -buffer -bar MatlabDbstop     :call matlab#debug#Dbstop()
+command! -buffer -bar MatlabDbclear    :call matlab#debug#Dbclear()
+command! -buffer -bar MatlabDbclearall :call matlab#debug#Dbclearall()
+command! -buffer -bar MatlabDbquit     :call matlab#debug#Dbquit()
+command! -buffer -bar MatlabDbstep     :call matlab#debug#Dbstep()
 command! -buffer -bar MatlabCd         :call MatlabCd()
 
 " Running the script
