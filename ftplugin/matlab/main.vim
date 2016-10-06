@@ -7,14 +7,11 @@
 "
 "  Description: MATLAB filetype settings and mappings
 "=============================================================================
-if exists('g:loaded_breptile_matlab')
-    finish
-end
 
 "-----------------------------------------------------------------------------
 "       Configuration  {{{
 "-----------------------------------------------------------------------------
-if exists("g:matlab_pane") && g:matlab_pane
+if exists("g:matlab_pane") && strlen("g:matlab_pane") > 0
     let b:breptile_tmuxpane = g:matlab_pane
 endif
 
@@ -25,6 +22,13 @@ endif
 " Search pattern for gnuplot pane
 " let b:tpgrep_pat = get(b:, 'tpgrep_pat', '/Applications/[M]ATLAB')
 let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[r]lwrap.*matlab')
+
+if g:breptile_usetpgrep 
+   augroup MatlabFindPane
+       autocmd!
+       autocmd Filetype matlab autocmd BufEnter BReptileFindPane
+   augroup END
+endif
 
 "}}}--------------------------------------------------------------------------
 "        Buffer-local settings {{{
@@ -98,6 +102,6 @@ if g:breptile_mapkeys_matlab "{{{
 endif
 "}}}
 "}}}
-let g:loaded_breptile_matlab = 1
+
 "=============================================================================
 "=============================================================================

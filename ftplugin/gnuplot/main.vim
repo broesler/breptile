@@ -24,12 +24,37 @@ if !exists("g:gnuplot_command")
 endif
 
 " Directly set pane if it exists and is non-empty
-if exists("g:gnuplot_pane") && g:gnuplot_pane
+if exists("g:gnuplot_pane") && strlen("g:gnuplot_pane") > 0
     let b:breptile_tmuxpane = g:gnuplot_pane
 endif
 
 " Search pattern for gnuplot pane
 let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[g]nuplot')
+
+if g:breptile_usetpgrep 
+   augroup GnuplotFindPane
+       autocmd!
+       autocmd Filetype gnuplot autocmd BufEnter BReptileFindPane
+   augroup END
+endif
+
+" TODO move this function to a generic breptile function
+function! s:GnuplotRunFile()
+    " Error looks like:
+    "   set itle 'Simple Plots'
+    "       ^
+    "   "simple_1_gnuplot.gpi", line 7: unrecognized option - see 'help set'.
+    let &l:errorformat="%E%p^,%Z\"%f\"\\, line %l:%m"
+    let &l:makeprg = g:gnuplot_command . " " . bufname("%")
+
+    " Don't jump to first error
+    write | silent make! | redraw!
+endfunction
+
+noremap <silent> <Plug>BReptileGnuplotrunfile :<C-u>call <SID>GnuplotRunFile()<CR>
+
+" User puts this mapping in their vimrc:
+nmap <buffer> <localleader>M <Plug>BReptileGnuplotrunfile
 
 " Buffer-local settings {{{
 setlocal tabstop=4            " tabs every 4 spaces
