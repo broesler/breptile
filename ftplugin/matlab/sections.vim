@@ -6,6 +6,10 @@
 "  Description: Control section movements in matlab files
 "
 "=============================================================================
+if exists("g:loaded_breptile_matlab_sections")
+    finish
+endif
+
 function! s:NextSection(type, backwards, visual)
     if a:visual
         normal! gv
@@ -44,5 +48,6 @@ vnoremap <script> <buffer> <silent> [[ :<C-u>call <SID>NextSection(1, 1, 1)<CR>
 vnoremap <script> <buffer> <silent> ][ :<C-u>call <SID>NextSection(2, 0, 1)<CR>
 vnoremap <script> <buffer> <silent> [] :<C-u>call <SID>NextSection(2, 1, 1)<CR>
 
+let g:loaded_breptile_matlab_sections = 1
 "=============================================================================
 "=============================================================================

@@ -12,7 +12,42 @@ if exists('g:loaded_breptile_matlab')
 end
 
 "-----------------------------------------------------------------------------
-"       Commands and Keymaps
+"       Configuration  {{{
+"-----------------------------------------------------------------------------
+if exists("g:matlab_pane") && g:matlab_pane
+    let b:breptile_tmuxpane = g:matlab_pane
+endif
+
+if !exists("g:breptile_mapkeys_matlab")
+    let g:breptile_mapkeys_matlab = 0
+endif
+
+" Search pattern for gnuplot pane
+" let b:tpgrep_pat = get(b:, 'tpgrep_pat', '/Applications/[M]ATLAB')
+let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[r]lwrap.*matlab')
+
+"}}}--------------------------------------------------------------------------
+"        Buffer-local settings {{{
+"-----------------------------------------------------------------------------
+setlocal tabstop=4            " tabs every 4 spaces
+setlocal softtabstop=0        " let backspace delete indent
+setlocal shiftwidth=4
+setlocal textwidth=80
+setlocal iskeyword-=:         " colon is NOT part of keywords
+setlocal formatoptions-=t     " do not auto-wrap code, only comments
+
+setlocal comments=:%
+setlocal commentstring=%%%s
+
+setlocal foldlevelstart=0     " all folds open to start
+setlocal foldmethod=indent
+setlocal foldnestmax=4
+setlocal foldignore=
+setlocal foldminlines=3
+
+setlocal nowrap
+"}}}--------------------------------------------------------------------------
+"       Commands and Keymaps {{{
 "-----------------------------------------------------------------------------
 command! -buffer -bar MatlabCd         :call matlab#util#MatlabCd()
 command! -buffer -bar MatlabLintScript :call matlab#util#MatlabLintScript()
@@ -62,7 +97,7 @@ if g:breptile_mapkeys_matlab "{{{
     augroup END
 endif
 "}}}
-
+"}}}
 let g:loaded_breptile_matlab = 1
 "=============================================================================
 "=============================================================================
