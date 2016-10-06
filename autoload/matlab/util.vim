@@ -52,7 +52,7 @@ function! matlab#util#MatlabLintScript() "{{{
     update | silent! make! | redraw!
 endfunction
 "}}}
-function! MatlabRunScript() "{{{
+function! matlab#util#MatlabRunScript() "{{{
     " TODO move this function to a generic breptile function
     " Check if Matlab is running!
     if strlen(b:breptile_tmuxpane) == 0
