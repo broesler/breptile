@@ -35,7 +35,7 @@ MAPPINGS					*breptile-mappings*
 CONFIGURATION					*breptile-configuration*
 
 BUGS 						*breptile-bugs*
-	ISSUE [09/21/2016, 15:02]:
+	ISSUE [09/21/2016, 15:02 BTR]:
 	-- Trouble with single quotes followed by a newline, but only when the
 	single quoted line is in the middle of other lines, i.e.
 		set title 'Simple Plots'
@@ -71,6 +71,9 @@ BUGS 						*breptile-bugs*
 	NOTE: The same problem occurs with "tmux load/paste-buffer". Entire
 	description is posted to a StackOverflow question here
 	<http://stackoverflow.com/questions/39646008/why-does-tmux-not-insert-newlines-when-pasting-a-multi-line-command>
+	[10/06/2016, 15:18 BTR]: This question has been resolved.
+	`reattach-to-user-namespace` was the culprit. Pasting now works
+	properly with no "sleep" commands.
 	
 	In general, we need to double quote the vim string that we pass to
 	shellescape(), so that single quotes get properly escaped, i.e. 
