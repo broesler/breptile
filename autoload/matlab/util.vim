@@ -52,31 +52,6 @@ function! matlab#util#MatlabLintScript() "{{{
     update | silent! make! | redraw!
 endfunction
 "}}}
-function! matlab#util#MatlabRunScript() "{{{
-    " TODO move this function to a generic breptile function
-    " Check if Matlab is running!
-    if strlen(b:breptile_tmuxpane) == 0
-        echohl WarningMsg 
-              \| echom 'WARNING: Matlab is not running!' 
-              \| echohl None
-        return -1
-    end
-    
-    let mpane = substitute(b:breptile_tmuxpane, '%','\\%', 'g')
-    let &l:makeprg='ts -t ''' . mpane . ''' ' . shellescape(expand("%:t:r"))
-
-    " NOTE: efm will not do anything with &l:makeprg set to "ts -t..." because
-    " just sending keys to tmux will not report anything back to the vim pane
-    "
-    " List efm most restrictive to least restrictive patterns
-    let &l:errorformat="%WWarning: %m,%Z> in %f (line %l),"
-                \ . "%ZError in %f (line %l),%+EError using%.%#,%C%m,%-G%.%#"
-    " \ . "%EError: File: %f Line: %l Column: %c,%Z%m"
-
-    " save changes made to the file so Matlab gets the most recent version
-    update | silent! make! | redraw!
-endfunction
-"}}}
 
 let g:loaded_breptile_matlab_util = 1
 " vim:fdm=marker

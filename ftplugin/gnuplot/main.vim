@@ -1,27 +1,14 @@
 "=============================================================================
-"     File: settings.vim
+"     File: main.vim
 "  Created: 09/14/2016, 16:11
 "   Author: Bernie Roesler
 "
 "  Description: Buffer settings for gnuplot files
 "
 "=============================================================================
-if exists("g:loaded_breptile_gnuplot_settings")
-    finish
-endif
-
-if !exists("g:gnuplot_defaultoptions")
-    let g:gnuplot_defaultoptions = "-p"
-endif
-
-if !exists("g:gnuplot_command")
-    if executable('gnuplot')
-        let g:gnuplot_command = "gnuplot"
-    else
-        finish
-    endif
-    let g:gnuplot_command .= " " . g:gnuplot_defaultoptions
-endif
+" Configuration {{{
+" Gnuplot script-running command
+let b:breptile_program = get(g:, "g:breptile_gnuplot_program","load")
 
 " Directly set pane if it exists and is non-empty
 if exists("g:gnuplot_pane") && strlen("g:gnuplot_pane") > 0
@@ -29,33 +16,18 @@ if exists("g:gnuplot_pane") && strlen("g:gnuplot_pane") > 0
 endif
 
 " Search pattern for gnuplot pane
-let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[g]nuplot')
+let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_gnuplot', '[g]nuplot')
 
-if g:breptile_usetpgrep 
-   augroup GnuplotFindPane
-       autocmd!
-       autocmd Filetype gnuplot autocmd BufEnter BReptileFindPane
-   augroup END
-endif
+" Gnuplot error looks like:
+"   set itle 'Simple Plots'
+"       ^
+"   "simple_1_gnuplot.gpi", line 7: unrecognized option - see 'help set'.
+let b:gnuplot_errorformat="%E%p^,%Z\"%f\"\\, line %l:%m"
+" let b:gnuplot_makeprg = g:gnuplot_command . " " . bufname("%")
+" Need to use gnuplot> load "filename.gpi"
+let b:gnuplot_makeprg = 'load "' . expand("%:t") . '"'
 
-" TODO move this function to a generic breptile function
-function! s:GnuplotRunFile()
-    " Error looks like:
-    "   set itle 'Simple Plots'
-    "       ^
-    "   "simple_1_gnuplot.gpi", line 7: unrecognized option - see 'help set'.
-    let &l:errorformat="%E%p^,%Z\"%f\"\\, line %l:%m"
-    let &l:makeprg = g:gnuplot_command . " " . bufname("%")
-
-    " Don't jump to first error
-    write | silent make! | redraw!
-endfunction
-
-noremap <silent> <Plug>BReptileGnuplotrunfile :<C-u>call <SID>GnuplotRunFile()<CR>
-
-" User puts this mapping in their vimrc:
-nmap <buffer> <localleader>M <Plug>BReptileGnuplotrunfile
-
+"}}}
 " Buffer-local settings {{{
 setlocal tabstop=4            " tabs every 4 spaces
 setlocal softtabstop=4        " let backspace delete indent
@@ -73,8 +45,7 @@ setlocal foldignore=
 setlocal foldminlines=3
 
 setlocal nowrap
-"}}}
 
-let g:loaded_breptile_gnuplot_settings = 1
+"}}}
 "=============================================================================
 "=============================================================================

@@ -1,5 +1,5 @@
 "=============================================================================
-"     File: breptile/ftplugin/matlab/mappings.vim
+"     File: breptile/ftplugin/matlab/main.vim
 "   Author: Bernie Roesler
 "  Created: 12/07/15, 12:27
 "
@@ -11,6 +11,9 @@
 "-----------------------------------------------------------------------------
 "       Configuration  {{{
 "-----------------------------------------------------------------------------
+" Matlab script-running command
+let b:breptile_program = get(g:, "g:breptile_matlab_program", "run")
+
 if exists("g:matlab_pane") && strlen("g:matlab_pane") > 0
     let b:breptile_tmuxpane = g:matlab_pane
 endif
@@ -20,15 +23,12 @@ if !exists("g:breptile_mapkeys_matlab")
 endif
 
 " Search pattern for gnuplot pane
-" let b:tpgrep_pat = get(b:, 'tpgrep_pat', '/Applications/[M]ATLAB')
-let b:tpgrep_pat = get(b:, 'tpgrep_pat', '[r]lwrap.*matlab')
+let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_matlab', '/Applications/[M]ATLAB')
 
-if g:breptile_usetpgrep 
-   augroup MatlabFindPane
-       autocmd!
-       autocmd Filetype matlab autocmd BufEnter BReptileFindPane
-   augroup END
-endif
+" Matlab EFM
+let b:matlab_errorformat="%WWarning: %m,%Z> in %f (line %l),"
+            \ . "%ZError in %f (line %l),%+EError using%.%#,%C%m,%-G%.%#"
+" \ . "%EError: File: %f Line: %l Column: %c,%Z%m"
 
 "}}}--------------------------------------------------------------------------
 "        Buffer-local settings {{{
@@ -50,12 +50,12 @@ setlocal foldignore=
 setlocal foldminlines=3
 
 setlocal nowrap
+
 "}}}--------------------------------------------------------------------------
 "       Commands and Keymaps {{{
 "-----------------------------------------------------------------------------
 command! -buffer -bar MatlabCd         :call matlab#util#MatlabCd()
 command! -buffer -bar MatlabLintScript :call matlab#util#MatlabLintScript()
-command! -buffer -bar MatlabRunScript  :call matlab#util#MatlabRunScript()
 command! -buffer -bar MatlabDbstop     :call matlab#debug#Dbstop()
 command! -buffer -bar MatlabDbclear    :call matlab#debug#Dbclear()
 command! -buffer -bar MatlabDbclearall :call matlab#debug#Dbclearall()
@@ -63,8 +63,7 @@ command! -buffer -bar MatlabDbquit     :call matlab#debug#Dbquit()
 command! -buffer -bar MatlabDbstep     :call matlab#debug#Dbstep()
 
 if g:breptile_mapkeys_matlab "{{{
-    " Running the script
-    nnoremap <buffer> <localleader>M :MatlabRunScript<CR>
+    " Syntax checking:
     nnoremap <buffer> <localleader>L :MatlabLintScript<CR>
 
     " Debugging
@@ -74,7 +73,7 @@ if g:breptile_mapkeys_matlab "{{{
     nnoremap <buffer> <localleader>C :MatlabDbclearall<CR>
     nnoremap <buffer> <localleader>q :MatlabDbquit<CR>
     nnoremap <buffer> <localleader>n :MatlabDbstep<CR>
-    " nnoremap <buffer> <localleader>Q :MatlabDbquit<bar>MatlabDbclearall<CR>
+    nnoremap <buffer> <localleader>Q :MatlabDbquit<bar>MatlabDbclearall<CR>
     nnoremap <buffer> <localleader>r :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbcont')<CR>
 
     " Call Matlab help on current word, or whos on variable
