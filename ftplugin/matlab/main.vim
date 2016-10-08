@@ -12,7 +12,7 @@
 "       Configuration  {{{
 "-----------------------------------------------------------------------------
 " Matlab script-running command
-let b:breptile_program = get(g:, "g:breptile_matlab_program", "run")
+let b:breptile_program = get(g:, "g:breptile_matlab_program", "run ")
 
 if exists("g:matlab_pane") && strlen("g:matlab_pane") > 0
     let b:breptile_tmuxpane = g:matlab_pane

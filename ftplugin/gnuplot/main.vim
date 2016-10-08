@@ -8,7 +8,7 @@
 "=============================================================================
 " Configuration {{{
 " Gnuplot script-running command
-let b:breptile_program = get(g:, "g:breptile_gnuplot_program","load")
+let b:breptile_program = get(g:, "g:breptile_gnuplot_program","load ")
 
 " Directly set pane if it exists and is non-empty
 if exists("g:gnuplot_pane") && strlen("g:gnuplot_pane") > 0
