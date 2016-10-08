@@ -6,13 +6,35 @@
 "  Description: General autoload functions for breptile plugin
 "
 "=============================================================================
-" if exists("g:autoloaded_breptile")
-"     finish
-" endif
+if exists("g:autoloaded_breptile")
+    finish
+endif
 
 "-----------------------------------------------------------------------------
 "       Public API 
 "-----------------------------------------------------------------------------
+function! breptile#GetConfig() abort "{{{
+    if exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
+        return 1
+    endif
+
+    " If we don't have a pane to use, find one. Prioritize tpgrep over global
+    " default set by user
+    if g:breptile_usetpgrep && exists("b:breptile_tpgrep_pat")
+        call s:FindProgramPane(b:breptile_tpgrep_pat)
+    elseif exists("g:breptile_defaultpane")
+        echom "Setting b:breptile_tmuxpane to '" . g:breptile_defaultpane . "'"
+        let b:breptile_tmuxpane = g:breptile_defaultpane
+    else " usetpgrep = 0 and no default pane set!
+        call s:Warn("WARNING: Program '" . &filetype . "' is not running!")
+        echom "Please specify a tmux pane in b:breptile_tmuxpane."
+        let b:breptile_tmuxpane = ''
+        return 2
+    endif
+
+    return 0
+endfunction
+"}}}
 function! breptile#UpdateProgramPane(...) abort "{{{
     if a:0 == 0
         call s:FindProgramPane(b:breptile_tpgrep_pat)
@@ -22,7 +44,7 @@ function! breptile#UpdateProgramPane(...) abort "{{{
 endfunction
 " }}}
 function! breptile#SendRange() range abort "{{{
-    if s:GetConfig()
+    if breptile#GetConfig()
         return
     endif
     let reg_save = @@
@@ -32,7 +54,7 @@ function! breptile#SendRange() range abort "{{{
 endfunction
 " }}}
 function! breptile#SendCount(count) abort "{{{
-    if s:GetConfig()
+    if breptile#GetConfig()
         return
     endif
     let reg_save = @@
@@ -72,28 +94,6 @@ function! s:TmuxSend(pane, text) abort "{{{
     call system(litkeys . ' && ' . creturn)
 endfunction
 "}}}
-function! s:GetConfig() abort "{{{
-    if exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
-        return 1
-    endif
-
-    " If we don't have a pane to use, find one. Prioritize tpgrep over global
-    " default set by user
-    if g:breptile_usetpgrep && exists("b:breptile_tpgrep_pat")
-        call s:FindProgramPane(b:breptile_tpgrep_pat)
-    elseif exists("g:breptile_defaultpane")
-        echom "Setting b:breptile_tmuxpane to '" . g:breptile_defaultpane . "'"
-        let b:breptile_tmuxpane = g:breptile_defaultpane
-    else " usetpgrep = 0 and no default pane set!
-        call s:Warn("WARNING: Program '" . &filetype . "' is not running!")
-        echom "Please specify a tmux pane in b:breptile_tmuxpane."
-        let b:breptile_tmuxpane = ''
-        return 2
-    endif
-
-    return 0
-endfunction
-"}}}
 function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
     if strlen(a:breptile_tpgrep_pat) == 0
         call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
@@ -128,7 +128,7 @@ function! s:EscapeText(text) abort "{{{
 endfunction
 "}}}
 function! s:SendOp(type) abort "{{{
-    if s:GetConfig()
+    if breptile#GetConfig()
         return
     endif
 

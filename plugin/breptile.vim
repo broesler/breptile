@@ -28,7 +28,10 @@ endif
 " Run the entire script
 command! -nargs=? -complete=file BReptileRunScript call breptile#RunScript(<f-args>)
 
-" Find program pane manually
+" Get the configuration variables
+command! BReptileGetConfig call breptile#GetConfig()
+
+" Find program pane manually (give tpgrep_pat)
 command! -nargs=? BReptileFindPane call breptile#UpdateProgramPane(<f-args>)
 
 " Sends lines to REPL
@@ -49,11 +52,11 @@ if g:breptile_usetpgrep
    " Set up autocmd to find the pane running the program
    augroup BReptileFindPane
        autocmd!
-       autocmd Filetype gnuplot,matlab,sh BReptileFindPane
+       autocmd Filetype gnuplot,matlab,sh BReptileGetConfig
    augroup END
 else
     " Just call it once
-    BReptileFindPane
+    BReptileGetConfig
 endif
 "}}}
 

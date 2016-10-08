@@ -11,8 +11,8 @@
 let b:breptile_program = get(g:, "g:breptile_bash_program", "./")
 
 " Directly set pane if it exists and is non-empty
-if exists("g:bash_pane") && strlen("g:bash_pane") > 0
-    let b:breptile_tmuxpane = g:bash_pane
+if exists("g:breptile_bash_pane") && strlen("g:breptile_bash_pane") > 0
+    let b:breptile_tmuxpane = g:breptile_bash_pane
 endif
 
 " Search pattern for gnuplot pane
