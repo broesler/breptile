@@ -1,10 +1,23 @@
 *breptile.vim* Integrate your REPL process with vim+tmux!
 
 Author:  Bernie Roesler <insert_site_here>
-License: Distributed under the MIT license (see |license|)
+License: Distributed under the MIT license (see |breptile-license|)
 
 This plugin is only available if 'compatible' is not set.
 
+CONTENTS 					*breptile-contents*
+
+    1. Introduction ......... |breptile-introduction|
+    2. Usage ................ |breptile-usage|
+    3. Mappings ............. |breptile-mappings|
+    4. Configuration ........ |breptile-configuration|
+    5. License .............. |breptile-license|
+    6. Bugs ................. |breptile-bugs|
+    7. Changelog ............ |breptile-changelog|
+    8. Contributing ......... |breptile-contributing|
+    9. Credits .............. |breptile-credits|
+
+================================================================================
 INTRODUCTION                                    *breptile*
 
 Whenever you edit a file in a tmux session, a set of commands is defined that
@@ -12,6 +25,7 @@ serve as a gateway to a neighboring tmux pane. Additional functionality is
 available based on filetype.
 
 USAGE 						*breptile-usage*
+
 COMMANDS                                        *breptile-commands*
 
 These commands are local to the buffers in which they work.
@@ -21,6 +35,12 @@ These commands are local to the buffers in which they work.
 			Find the pane in which {pattern} is running. {pattern}
 			is a standard grep expression that will uniquely match
 			the process name by which your REPL program is called.
+
+                                                *breptile-:BReptileRunScript*
+:BReptileRunScript {filename}
+			Run the given script in |b:breptile_tmuxpane|, using
+			|b:breptile_program|. If no {filename} is given, the
+			filename of the current buffer will be used.
 
                                                 *breptile-:BReptileSendCount*
 :BReptileSendCount {count}
@@ -33,6 +53,42 @@ These commands are local to the buffers in which they work.
 MAPPINGS					*breptile-mappings*
 
 CONFIGURATION					*breptile-configuration*
+
+The following variables can be set in your .vimrc to control the behavior of
+BReptile:
+
+The following variables are set by BReptile internally based on the user's
+global variables (or lack thereof).
+						*b:breptile_tmuxpane*
+b:breptile_tmuxpane 	The pane in which the program corresponding to the
+			current buffer is running. For a program running in tmux
+			session ID 1, window ID 2, pane ID 3,
+			b:breptile_tmuxpane has the format '$1:@2.%3'. You could
+			also give the pane as 'top-left'. See "man tmux".
+
+LICENSE 					*breptile-license*
+
+MIT License
+
+Copyright (c) 2016-present Bernard Roesler
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 BUGS 						*breptile-bugs*
 	ISSUE [09/21/2016, 15:02 BTR]:
@@ -91,7 +147,14 @@ BUGS 						*breptile-bugs*
 
 CHANGELOG					*breptile-changelog*
 
+[v0.0]
+
 CONTRIBUTING					*breptile-contributing*
+
+Please feel free to contact me at: 
+	bernard.roesler@gmail.com 
+with the subject line 
+	"[BReptile]: Contributing".
 
 CREDITS 					*breptile-credits*
 I owe significant thanks to Steve Losh's "Learn Vimscript the Hard Way"

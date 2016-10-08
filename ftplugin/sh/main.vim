@@ -1,31 +1,22 @@
 "=============================================================================
-"     File: main.vim
-"  Created: 09/14/2016, 16:11
+"     File: breptile/ftplugin/sh/main.vim
+"  Created: 10/07/2016, 20:35
 "   Author: Bernie Roesler
 "
-"  Description: Buffer settings for gnuplot files
+"  Description: Settings for shell scripts
 "
 "=============================================================================
-" Configuration {{{
+" Configuration "{{{
 " Gnuplot script-running command
-let b:breptile_program = get(g:, "g:breptile_gnuplot_program","load")
+let b:breptile_program = get(g:, "g:breptile_bash_program", "./")
 
 " Directly set pane if it exists and is non-empty
-if exists("g:gnuplot_pane") && strlen("g:gnuplot_pane") > 0
-    let b:breptile_tmuxpane = g:gnuplot_pane
+if exists("g:bash_pane") && strlen("g:bash_pane") > 0
+    let b:breptile_tmuxpane = g:bash_pane
 endif
 
 " Search pattern for gnuplot pane
-let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_gnuplot', '[g]nuplot')
-
-" Gnuplot error looks like:
-"   set itle 'Simple Plots'
-"       ^
-"   "simple_1_gnuplot.gpi", line 7: unrecognized option - see 'help set'.
-let b:gnuplot_errorformat="%E%p^,%Z\"%f\"\\, line %l:%m"
-" let b:gnuplot_makeprg = g:gnuplot_command . " " . bufname("%")
-" Need to use gnuplot> load "filename.gpi"
-let b:gnuplot_makeprg = 'load "' . expand("%:t") . '"'
+let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_bash', '/[u]sr/local/bin/bash')
 
 "}}}
 " Buffer-local settings {{{
@@ -45,10 +36,7 @@ setlocal foldignore=
 setlocal foldminlines=3
 
 setlocal nowrap
+
 "}}}
-" Mappings {{{
-" Make line into a comment header with dashes
-" nnoremap <buffer> <LocalLeader>h :MyCommentBlock # -<CR>
-" }}}
 "=============================================================================
 "=============================================================================

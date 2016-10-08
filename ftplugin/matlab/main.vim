@@ -92,12 +92,7 @@ if g:breptile_mapkeys_matlab "{{{
     nnoremap <buffer> <localleader>d :MatlabCd<CR>
 
     " Make line into a comment header with dashes
-    augroup headers
-        au!
-        autocmd BufEnter *.m let @h = 'O%' . expand(&textwidth-col('.')-1) 
-                      \ . 'a-jI%8a o%' . expand(&textwidth-col('.')-1) 
-                      \ . 'a-k$'
-    augroup END
+    " nnoremap <buffer> <LocalLeader>h :MyCommentBlock % -<CR>
 endif
 "}}}
 "}}}

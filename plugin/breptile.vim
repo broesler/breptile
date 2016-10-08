@@ -21,6 +21,7 @@ endif
 if !exists("g:breptile_usetpgrep")
     let g:breptile_usetpgrep = 0
 endif
+
 "}}}--------------------------------------------------------------------------
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
@@ -48,7 +49,7 @@ if g:breptile_usetpgrep
    " Set up autocmd to find the pane running the program
    augroup BReptileFindPane
        autocmd!
-       autocmd Filetype matlab,gnuplot autocmd BufEnter * BReptileFindPane
+       autocmd Filetype gnuplot,matlab,sh BReptileFindPane
    augroup END
 else
     " Just call it once
