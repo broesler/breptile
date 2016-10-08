@@ -7,9 +7,9 @@
 "  running commands/scripts in any tmux pane (except the one running vim!).
 "
 "=============================================================================
-" if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
-"   finish
-" endif
+if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
+  finish
+endif
 
 "-----------------------------------------------------------------------------
 "       Configuration  {{{
@@ -57,6 +57,6 @@ else
 endif
 "}}}
 
-let g:loaded_gnuplotvim = 1
+let g:loaded_breptile = 1
 "=============================================================================
 "=============================================================================
