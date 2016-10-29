@@ -30,6 +30,7 @@ function! breptile#GetConfig() "{{{
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
+        call s:Warn("breptile#GetConfig() failed to find a pane!")
         return 2    
     endif
 
@@ -81,7 +82,9 @@ function! breptile#RunScript(...) abort "{{{
     endif
 
     " Use the calling program's command
-    let l:com = b:breptile_program . shellescape(l:filename)
+    let l:com = b:breptile_program_start 
+                \ . l:filename
+                \ . b:breptile_program_end
     call s:TmuxSend(b:breptile_tmuxpane, l:com)
 endfunction
 "}}}
@@ -102,14 +105,18 @@ function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
         return
     endif
 
-    " TODO add option to search within session (make that default?), also
-    " search with other tmux servers (tmux -L ...)
+    " TODO add option to search within session
+    " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
     " [:-2] strips newline returned by 'system'
+    " Get current window ID:
     let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
 
     " Include pattern to match time, so user only has to grep for program name
     let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} " . a:breptile_tpgrep_pat . "'"
-    let l:syscom = 'tpgrep -t ' . l:tmux_window . ' ' . l:pat
+    " Search within window:
+    " let l:syscom = 'tpgrep -t ' . l:tmux_window . ' ' . l:pat
+    " Search within session:
+    let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
     let b:breptile_tmuxpane = system(l:syscom)[:-2]
 
     " Error checking

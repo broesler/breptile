@@ -12,7 +12,8 @@
 "       Configuration  {{{
 "-----------------------------------------------------------------------------
 " Matlab script-running command
-let b:breptile_program = get(g:, "g:breptile_matlab_program", "run ")
+let b:breptile_program_start = get(g:, "g:breptile_matlab_program_start", "run '")
+let b:breptile_program_end   = get(g:, "g:breptile_matlab_program_end",   "'")
 
 if exists("g:matlab_pane") && strlen("g:matlab_pane") > 0
     let b:breptile_tmuxpane = g:matlab_pane
@@ -33,10 +34,11 @@ let b:matlab_errorformat="%WWarning: %m,%Z> in %f (line %l),"
 "}}}--------------------------------------------------------------------------
 "        Buffer-local settings {{{
 "-----------------------------------------------------------------------------
-setlocal tabstop=4            " tabs every 4 spaces
-setlocal softtabstop=0        " let backspace delete indent
-setlocal shiftwidth=4
 setlocal textwidth=80
+setlocal tabstop=4
+setlocal softtabstop=4
+setlocal shiftwidth=4
+setlocal expandtab
 setlocal iskeyword-=:         " colon is NOT part of keywords
 setlocal formatoptions-=t     " do not auto-wrap code, only comments
 

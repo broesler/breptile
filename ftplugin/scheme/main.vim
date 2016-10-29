@@ -1,23 +1,24 @@
 "=============================================================================
-"     File: breptile/ftplugin/sh/main.vim
-"  Created: 10/07/2016, 20:35
+"     File: main.vim
+"  Created: 09/14/2016, 16:11
 "   Author: Bernie Roesler
 "
-"  Description: Settings for shell scripts
+"  Description: Buffer settings for scheme files
 "
 "=============================================================================
-" Configuration "{{{
-" Gnuplot script-running command
-let b:breptile_program_start = get(g:, "g:breptile_bash_program_start", "./'")
-let b:breptile_program_end   = get(g:, "g:breptile_bash_program_end", "'")
+" Configuration {{{
+" scheme script-running command
+let b:breptile_program_start = get(g:, "g:breptile_scheme_program_start", "(load \"")
+let b:breptile_program_end   = get(g:, "g:breptile_scheme_program_end",   "\")")
 
 " Directly set pane if it exists and is non-empty
-if exists("g:breptile_bash_pane") && strlen("g:breptile_bash_pane") > 0
-    let b:breptile_tmuxpane = g:breptile_bash_pane
+if exists("g:scheme_pane") && strlen("g:scheme_pane") > 0
+    let b:breptile_tmuxpane = g:scheme_pane
 endif
 
-" Search pattern for gnuplot pane
-let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_bash', '/[u]sr/local/bin/bash')
+" Search pattern for scheme pane
+let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_scheme', '[s]cheme')
+" let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_scheme', '[r]lwrap.*scheme')
 
 "}}}
 " Buffer-local settings {{{
@@ -28,8 +29,8 @@ setlocal textwidth=80
 setlocal iskeyword-=:         " colon is NOT part of keywords
 setlocal formatoptions-=t     " do not auto-wrap code, only comments
 
-setlocal comments=:#
-setlocal commentstring=#%s
+setlocal comments=:;
+setlocal commentstring=;%s
 
 setlocal foldmethod=indent
 setlocal foldnestmax=4
@@ -37,7 +38,10 @@ setlocal foldignore=
 setlocal foldminlines=3
 
 setlocal nowrap
-
 "}}}
+" Mappings {{{
+" Make line into a comment header with dashes
+" nnoremap <buffer> <LocalLeader>h :MyCommentBlock # -<CR>
+" }}}
 "=============================================================================
 "=============================================================================

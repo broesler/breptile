@@ -44,7 +44,7 @@ if g:breptile_mapkeys
     nmap <silent> <localleader>e <Plug>BReptileSendOpNorm
     vmap <silent> <localleader>e <Plug>BReptileSendOpVis
 
-    nnoremap <silent> <localleader>M :BReptileRunScript<CR>
+    nnoremap <silent> <localleader>R :BReptileRunScript<CR>
 endif
 "}}}
 " Set up autocmd to find the pane {{{
@@ -52,7 +52,7 @@ if g:breptile_usetpgrep
    " Set up autocmd to find the pane running the program
    augroup BReptileFindPane
        autocmd!
-       autocmd Filetype gnuplot,matlab,sh BReptileGetConfig
+       autocmd Filetype gnuplot,matlab,sh,scheme BReptileGetConfig
    augroup END
 else
     " Just call it once
