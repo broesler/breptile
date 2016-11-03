@@ -32,28 +32,6 @@ let b:matlab_errorformat="%WWarning: %m,%Z> in %f (line %l),"
 " \ . "%EError: File: %f Line: %l Column: %c,%Z%m"
 
 "}}}--------------------------------------------------------------------------
-"        Buffer-local settings {{{
-"-----------------------------------------------------------------------------
-setlocal textwidth=80
-setlocal tabstop=4
-setlocal softtabstop=4
-setlocal shiftwidth=4
-setlocal expandtab
-setlocal iskeyword-=:         " colon is NOT part of keywords
-setlocal formatoptions-=t     " do not auto-wrap code, only comments
-
-setlocal comments=:%
-setlocal commentstring=%%%s
-
-setlocal foldlevelstart=0     " all folds open to start
-setlocal foldmethod=indent
-setlocal foldnestmax=4
-setlocal foldignore=
-setlocal foldminlines=3
-
-setlocal nowrap
-
-"}}}--------------------------------------------------------------------------
 "       Commands and Keymaps {{{
 "-----------------------------------------------------------------------------
 command! -buffer -bar MatlabCd         :call matlab#util#MatlabCd()
@@ -65,6 +43,8 @@ command! -buffer -bar MatlabDbquit     :call matlab#debug#Dbquit()
 command! -buffer -bar MatlabDbstep     :call matlab#debug#Dbstep()
 
 if g:breptile_mapkeys_matlab "{{{
+    " TODO move these 'ts -t' maps to functions using "TmuxSend" (and make
+    " that function globally available, for generally sending it)
     " Syntax checking:
     nnoremap <buffer> <localleader>L :MatlabLintScript<CR>
 
