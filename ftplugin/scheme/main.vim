@@ -26,7 +26,12 @@ let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_scheme', '[s]cheme')
 command! -buffer -bar SchemeCd      :call scheme#SchemeCd()
 command! -buffer -bar SchemeQuit    :call scheme#SchemeQuit()
 command! -buffer -bar SchemeAbort   :call scheme#SchemeAbort()
+command! -buffer -bar SchemeClear   :call scheme#SchemeClear()
+
 " Change scheme directory
 nnoremap <buffer> <localleader>d :SchemeCd<CR>
+nnoremap <buffer> <localleader>c :SchemeQuit<CR>
+nnoremap <buffer> <localleader>x :SchemeAbort<CR>
+nnoremap <buffer> <localleader>l :SchemeClear<CR>
 "=============================================================================
 "=============================================================================

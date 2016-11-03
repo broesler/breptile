@@ -59,7 +59,7 @@ function! breptile#SendRange() range abort "{{{
     endif
     let reg_save = @@
     silent execute a:firstline . ',' . a:lastline . 'y'
-    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
 " }}}
@@ -70,7 +70,7 @@ function! breptile#SendCount(count) abort "{{{
     endif
     let reg_save = @@
     silent execute 'normal! ' . a:count . 'yy'
-    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
 " }}}
@@ -93,20 +93,26 @@ function! breptile#RunScript(...) abort "{{{
     let l:com = b:breptile_program_start 
                 \ . l:filename
                 \ . b:breptile_program_end
-    call s:TmuxSend(b:breptile_tmuxpane, l:com)
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, l:com)
 endfunction
 "}}}
-
-"-----------------------------------------------------------------------------
-"       Private API 
-"-----------------------------------------------------------------------------
-function! s:TmuxSend(pane, text) abort "{{{
+function! breptile#TmuxSend(pane, text) abort "{{{
+    " Send command NOT literally, do not send carriage return
+    let com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
+    call system(com)
+endfunction
+"}}}
+function! breptile#TmuxSendwithReturn(pane, text) abort "{{{
     " Send command literally, and then send carriage return keystroke
     let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
     let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
     call system(litkeys . ' && ' . creturn)
 endfunction
 "}}}
+
+"-----------------------------------------------------------------------------
+"       Private API 
+"-----------------------------------------------------------------------------
 function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
     if strlen(a:breptile_tpgrep_pat) == 0
         call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
@@ -168,7 +174,7 @@ function! s:SendOp(type) abort "{{{
         return  
     endif
 
-    call s:TmuxSend(b:breptile_tmuxpane, s:EscapeText(@@))
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
 
     " Return selection and unnamed register to previous values
     let &selection = sel_save
