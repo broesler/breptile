@@ -26,7 +26,7 @@ endif
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
 " Run the entire script
-command! -nargs=? -complete=file BReptileRunScript call breptile#RunScript(<f-args>)
+command! -nargs=? -complete=file BReptileRunScript update | call breptile#RunScript(<f-args>)
 
 " Get the configuration variables
 command! BReptileGetConfig call breptile#GetConfig()

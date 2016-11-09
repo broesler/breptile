@@ -85,8 +85,8 @@ function! breptile#RunScript(...) abort "{{{
     if a:0
         let l:filename = a:1
     else
-        " use current buffer (expands to full file path)
-        let l:filename = bufname("%")
+        " use current buffer (expand to full file path)
+        let l:filename = expand("%:p")
     endif
 
     " Use the calling program's command
