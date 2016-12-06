@@ -30,7 +30,7 @@ function! breptile#GetConfig() "{{{
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
-        call s:Warn("breptile#GetConfig() failed to find a pane!")
+        " call s:Warn("breptile#GetConfig() failed to find a pane!")
         return 2    
     endif
 
@@ -47,7 +47,7 @@ function! breptile#UpdateProgramPane(...) abort "{{{
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
-        call s:Warn("breptile#GetConfig() failed to find a pane!")
+        " call s:Warn("breptile#GetConfig() failed to find a pane!")
         return 2    
     endif
 endfunction
