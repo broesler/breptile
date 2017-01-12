@@ -34,7 +34,7 @@ function! matlab#util#MatlabLintScript() "{{{
     " ========== <filename without extension> ==========
     " L 0 (C 0): MDOTM :Filename 'filename' must end in .m or .M
 
-    let &l:makeprg="/Applications/MATLAB_R2015b.app/bin/maci64/mlint -id "
+    let &l:makeprg="/Applications/MATLAB_R2016b.app/bin/maci64/mlint -id "
                 \.shellescape(expand("%:p")).' '.shellescape(expand("%:p:r"))
 
     " List efm most restrictive to least restrictive patterns

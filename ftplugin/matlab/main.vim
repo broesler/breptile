@@ -40,6 +40,7 @@ command! -buffer -bar MatlabDbstop     :call matlab#debug#Dbstop()
 command! -buffer -bar MatlabDbclear    :call matlab#debug#Dbclear()
 command! -buffer -bar MatlabDbclearall :call matlab#debug#Dbclearall()
 command! -buffer -bar MatlabDbquit     :call matlab#debug#Dbquit()
+command! -buffer -bar MatlabDbquitall  :call matlab#debug#Dbquitall()
 command! -buffer -bar MatlabDbstep     :call matlab#debug#Dbstep()
 
 if g:breptile_mapkeys_matlab "{{{
@@ -55,7 +56,7 @@ if g:breptile_mapkeys_matlab "{{{
     nnoremap <buffer> <localleader>C :MatlabDbclearall<CR>
     nnoremap <buffer> <localleader>q :MatlabDbquit<CR>
     nnoremap <buffer> <localleader>n :MatlabDbstep<CR>
-    nnoremap <buffer> <localleader>Q :MatlabDbquit<bar>MatlabDbclearall<CR>
+    nnoremap <buffer> <localleader>Q :MatlabDbquitall<CR>
     nnoremap <buffer> <localleader>r :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbcont')<CR>
 
     " Call Matlab help on current word, or whos on variable

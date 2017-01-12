@@ -51,6 +51,17 @@ function! matlab#debug#Dbquit() "{{{
     set ma
 endfunction
 "}}}
+function! matlab#debug#Dbquitall() "{{{
+    " Send dbquit to matlab
+    call system('ts -t ''' . b:breptile_tmuxpane . ''' dbquit all')
+
+    " Remove debugging cursor marker
+    silent! sign unplace 1
+
+    " Make file modifiable again
+    set ma
+endfunction
+"}}}
 function! matlab#debug#Dbstep() "{{{
     " Unplace sign at current cursor position
     silent! sign unplace 1

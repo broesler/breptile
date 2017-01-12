@@ -28,10 +28,16 @@ command! -buffer -bar SchemeQuit    :call scheme#SchemeQuit()
 command! -buffer -bar SchemeAbort   :call scheme#SchemeAbort()
 command! -buffer -bar SchemeClear   :call scheme#SchemeClear()
 
-" Change scheme directory
+" Commands to control Scheme REPL
 nnoremap <buffer> <localleader>d :SchemeCd<CR>
-nnoremap <buffer> <localleader>c :SchemeQuit<CR>
-nnoremap <buffer> <localleader>x :SchemeAbort<CR>
+nnoremap <buffer> <localleader>C :SchemeQuit<CR>
+nnoremap <buffer> <localleader>X :SchemeAbort<CR>
 nnoremap <buffer> <localleader>l :SchemeClear<CR>
+
+" Evaluate current expression
+if g:breptile_mapkeys
+    " Allow recursive mapping to use operator function
+    nmap <localleader><CR> <localleader>ea(
+endif
 "=============================================================================
 "=============================================================================
