@@ -12,7 +12,7 @@ endif
 
 " Define signs for debugging stops {{{
 hi clear SignColumn
-hi default DebugStopHL ctermfg=red
+hi default DebugStopHL ctermfg=darkred
 hi link DebugCursorHL Search
 sign define dbstop text=$$ texthl=DebugStopHL
 sign define piet   text=>> texthl=DebugCursorHL
