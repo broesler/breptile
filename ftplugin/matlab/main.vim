@@ -50,20 +50,20 @@ if g:breptile_mapkeys_matlab "{{{
     nnoremap <buffer> <localleader>L :MatlabLintScript<CR>
 
     " Debugging
-    nnoremap <buffer> <localleader>b :MatlabDbstop<CR>
-    nnoremap <buffer> <localleader>S :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbstatus')<CR>
-    nnoremap <buffer> <localleader>c :MatlabDbclear<CR>
-    nnoremap <buffer> <localleader>C :MatlabDbclearall<CR>
-    nnoremap <buffer> <localleader>q :MatlabDbquit<CR>
-    nnoremap <buffer> <localleader>n :MatlabDbstep<CR>
-    nnoremap <buffer> <localleader>Q :MatlabDbquitall<CR>
-    nnoremap <buffer> <localleader>r :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbcont')<CR>
+    nnoremap          <buffer> <localleader>b :MatlabDbstop<CR>
+    nnoremap <silent> <buffer> <localleader>S :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbstatus')<CR>
+    nnoremap          <buffer> <localleader>c :MatlabDbclear<CR>
+    nnoremap          <buffer> <localleader>C :MatlabDbclearall<CR>
+    nnoremap          <buffer> <localleader>q :MatlabDbquit<CR>
+    nnoremap          <buffer> <localleader>n :MatlabDbstep<CR>
+    nnoremap          <buffer> <localleader>Q :MatlabDbquitall<CR>
+    nnoremap <silent> <buffer> <localleader>r :call system('ts -t ''' . b:breptile_tmuxpane . ''' dbcont')<CR>
 
     " Call Matlab help on current word, or whos on variable
     " TODO include 'whodat.m' in package
-    nnoremap <buffer> <localleader>h :call system('ts -t ''' . b:breptile_tmuxpane . ''' "help <C-R><C-W>"')<CR>
-    nnoremap <buffer> <localleader>w :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whodat <C-R><C-W>"')<CR>
-    nnoremap <buffer> <localleader>W :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whodat"')<CR>
+    nnoremap <silent> <buffer> <localleader>h :call system('ts -t ''' . b:breptile_tmuxpane . ''' "help <C-R><C-W>"')<CR>
+    nnoremap <silent> <buffer> <localleader>w :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whodat <C-R><C-W>"')<CR>
+    nnoremap <silent> <buffer> <localleader>W :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whodat"')<CR>
     " Standard usage:
     " nnoremap <buffer> <localleader>w :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whos <C-R><C-W>"')<CR>
     " nnoremap <buffer> <localleader>W :call system('ts -t ''' . b:breptile_tmuxpane . ''' "whos"')<CR>

@@ -25,7 +25,8 @@ function! matlab#debug#Dbstop() "{{{
     " place sign at dbstop current line, use lnr as ID
     exe ":silent sign place " . lnr . " line=" . lnr . " name=dbstop file=" . expand("%:p")
     " keep file from being modified during debugging
-    set noma
+    " NOTE: Comment out for now... it's annoying and I know how it works
+    " set noma
 endfunction
 "}}}
 function! matlab#debug#Dbclear() "{{{

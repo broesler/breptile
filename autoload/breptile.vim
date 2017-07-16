@@ -89,6 +89,8 @@ function! breptile#RunScript(...) abort "{{{
         let l:filename = expand("%:p")
     endif
 
+    " TODO replace l:com definition with formatted string, so we only have to
+    " take, say, 'run(\'%s\')' as an argument, and insert l:filename for %s
     " Use the calling program's command
     let l:com = b:breptile_program_start 
                 \ . l:filename
