@@ -27,37 +27,37 @@ endif
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
 " Run the entire script
-command! -nargs=? -complete=file BReptileRunScript update | call breptile#RunScript(<f-args>)
+command! -nargs=? -complete=file BRRunScript update | call breptile#RunScript(<f-args>)
 
 " Get the configuration variables
-command! BReptileGetConfig call breptile#GetConfig()
+command! BRGetConfig call breptile#GetConfig()
 
 " Find program pane manually (give tpgrep_pat)
-command! -nargs=? BReptileFindPane call breptile#UpdateProgramPane(<f-args>)
+command! -nargs=? BRFindPane call breptile#UpdateProgramPane(<f-args>)
 
 " Sends lines to REPL
-command! -count      BReptileSendCount  call breptile#SendCount(<count>)
-command! -range -bar BReptileSendRange  <line1>,<line2>call breptile#SendRange()
+command! -count      BRSendCount  call breptile#SendCount(<count>)
+command! -range -bar BRSendRange  <line1>,<line2>call breptile#SendRange()
 
 " User uses these maps in their vimrc:
 if g:breptile_mapkeys
     " ALLOW recursion here so that <Plug>s work properly
-    nmap <silent> <localleader>e <Plug>BReptileSendOpNorm
-    vmap <silent> <localleader>e <Plug>BReptileSendOpVis
+    nmap <silent> <localleader>e <Plug>BRSendOpNorm
+    vmap <silent> <localleader>e <Plug>BRSendOpVis
 
-    nnoremap <silent> <localleader>R :BReptileRunScript<CR>
+    nnoremap <silent> <localleader>R :BRRunScript<CR>
 endif
 "}}}
 " Set up autocmd to find the pane {{{
 if g:breptile_usetpgrep 
    " Set up autocmd to find the pane running the program
-   augroup BReptileFindPane
+   augroup BRFindPane
        autocmd!
-       autocmd Filetype gnuplot,matlab,sh,scheme BReptileGetConfig
+       autocmd Filetype gnuplot,matlab,python,sh,scheme BRGetConfig
    augroup END
 else
     " Just call it once
-    BReptileGetConfig
+    BRGetConfig
 endif
 "}}}
 
