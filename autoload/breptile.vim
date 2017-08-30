@@ -44,6 +44,8 @@ function! breptile#UpdateProgramPane(...) abort "{{{
     endif
 
     if strlen(b:breptile_tmuxpane) > 0
+        echom "Found program '" . &filetype 
+                    \ . "' running in pane " . b:breptile_tmuxpane
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
