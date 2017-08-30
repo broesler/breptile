@@ -30,14 +30,18 @@ endif
 command! -nargs=? -complete=file BRRunScript update | call breptile#RunScript(<f-args>)
 
 " Get the configuration variables
+" TODO create <bang> version that forces update even if we have an existing b:breptile_tmuxpane
 command! BRGetConfig call breptile#GetConfig()
 
 " Find program pane manually (give tpgrep_pat)
 command! -nargs=? BRFindPane call breptile#UpdateProgramPane(<f-args>)
 
 " Sends lines to REPL
-command! -count      BRSendCount  call breptile#SendCount(<count>)
+command! -count BRSendCount call breptile#SendCount(<count>)
 command! -range -bar BRSendRange  <line1>,<line2>call breptile#SendRange()
+
+" Send arbitrary text to local tmuxpane
+command! -nargs=1 BRTmuxSend call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, <args>)
 
 " User uses these maps in their vimrc:
 if g:breptile_mapkeys

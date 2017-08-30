@@ -91,26 +91,22 @@ function! breptile#RunScript(...) abort "{{{
         let l:filename = expand("%:p")
     endif
 
-    " TODO replace l:com definition with formatted string, so we only have to
-    " take, say, 'run(\'%s\')' as an argument, and insert l:filename for %s
     " Use the calling program's command
-    let l:com = b:breptile_program_start 
-                \ . l:filename
-                \ . b:breptile_program_end
+    let l:com = printf(b:breptile_runfmt, l:filename)
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, l:com)
 endfunction
 "}}}
 function! breptile#TmuxSend(pane, text) abort "{{{
     " Send command NOT literally, do not send carriage return
-    let com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
-    call system(com)
+    let l:com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
+    call system(l:com)
 endfunction
 "}}}
 function! breptile#TmuxSendwithReturn(pane, text) abort "{{{
     " Send command literally, and then send carriage return keystroke
-    let litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
-    let creturn = "tmux send-keys -t '" . a:pane . "' C-m"
-    call system(litkeys . ' && ' . creturn)
+    let l:litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
+    let l:creturn = "tmux send-keys -t '" . a:pane . "' C-m"
+    call system(l:litkeys . ' && ' . l:creturn)
 endfunction
 "}}}
 
@@ -195,11 +191,9 @@ endfunction
 "        Create <Plug> for user mappings
 "-----------------------------------------------------------------------------
 " Send text operator{{{
-noremap <silent> <Plug>BReptileSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
-noremap <silent> <Plug>BReptileSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
+noremap <silent> <Plug>BRSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
+noremap <silent> <Plug>BRSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
 "}}}
-" Run script -- how do I make a command that links to this <Plug>?
-" noremap <silent> <Plug>BReptileRunScript :<C-u>call <SID>RunScript(<q-args>)<CR>
 
 let g:autoloaded_breptile = 1
 "=============================================================================

@@ -12,8 +12,8 @@ endif
 
 function! matlab#util#MatlabCd() "{{{
     " Use cd('full path') form to deal with spaces, etc. in filenames
-    let mcom = 'cd(''' . expand("%:p:h") . ''')'
-    call system('ts -t ''' . b:breptile_tmuxpane . ''' ' . shellescape(mcom))
+    let l:mcom = 'cd(''' . expand("%:p:h") . ''')'
+    BRTmuxSend l:mcom
 endfunction
 "}}}
 function! matlab#util#MatlabLintScript() "{{{

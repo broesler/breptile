@@ -1,5 +1,5 @@
 "=============================================================================
-"     File: main.vim
+"     File: breptile/ftplugin/scheme.vim
 "  Created: 09/14/2016, 16:11
 "   Author: Bernie Roesler
 "
@@ -8,17 +8,15 @@
 "=============================================================================
 " Configuration {{{
 " scheme script-running command
-let b:breptile_program_start = get(g:, "g:breptile_scheme_program_start", "(load \"")
-let b:breptile_program_end   = get(g:, "g:breptile_scheme_program_end",   "\")")
+let b:breptile_runfmt = get(g:, "g:breptile_scheme_runfmt", "(load \"%s\")")
 
 " Directly set pane if it exists and is non-empty
 if exists("g:scheme_pane") && strlen("g:scheme_pane") > 0
     let b:breptile_tmuxpane = g:scheme_pane
 endif
 
-" Search pattern for scheme pane
+" Default search pattern for scheme pane
 let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_scheme', '[s]cheme')
-" let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_scheme', '[r]lwrap.*scheme')
 
 "}}}--------------------------------------------------------------------------
 "       Commands and Keymaps {{{
