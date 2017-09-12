@@ -13,8 +13,10 @@ endif
 "-----------------------------------------------------------------------------
 "       Public API 
 "-----------------------------------------------------------------------------
-function! breptile#GetConfig() "{{{
-    if exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
+function! breptile#GetConfig(bang) "{{{
+    " if GetConfig is called with a "true" input, look for a pane regardless
+    " of whether we already have one or not
+    if !a:bang && exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
         return 0    " no updates to be made, carry on
     endif
 
@@ -30,7 +32,7 @@ function! breptile#GetConfig() "{{{
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
-        " call s:Warn("breptile#GetConfig() failed to find a pane!")
+        " call s:Warn("breptile#GetConfig() failed to find a pane! Run BRFindPane.")
         return 2    
     endif
 
@@ -49,14 +51,13 @@ function! breptile#UpdateProgramPane(...) abort "{{{
         return 0    " We have a pane!
     else
         " error! the user said not to use tpgrep, and we couldn't find a pane
-        " call s:Warn("breptile#GetConfig() failed to find a pane!")
+        call s:Warn("breptile#GetConfig() failed to find a pane!")
         return 2    
     endif
 endfunction
 " }}}
 function! breptile#SendRange() range abort "{{{
-    if breptile#GetConfig()
-        call s:Warn("WARNING: Program '" . &filetype . "' is not running!")
+    if !s:IsValidPane()
         return
     endif
     let reg_save = @@
@@ -66,8 +67,7 @@ function! breptile#SendRange() range abort "{{{
 endfunction
 " }}}
 function! breptile#SendCount(count) abort "{{{
-    if breptile#GetConfig()
-        call s:Warn("WARNING: Program '" . &filetype . "' is not running!")
+    if !s:IsValidPane()
         return
     endif
     let reg_save = @@
@@ -77,32 +77,29 @@ function! breptile#SendCount(count) abort "{{{
 endfunction
 " }}}
 function! breptile#RunScript(...) abort "{{{
-    " Check if program is running!
-    if !exists('b:breptile_tmuxpane') || (strlen(b:breptile_tmuxpane) == 0)
-        call s:Warn("Program '" . &filetype . "' is not running!")
-        return -1
-    end
-
-    " If we have an argument, use it as the filename to be run
-    if a:0
-        let l:filename = a:1
-    else
-        " use current buffer (expand to full file path)
-        let l:filename = expand("%:p")
+    if !s:IsValidPane()
+        return
     endif
-
+    " If we have an argument, use it as the filename to be run
+    let l:filename = a:0 ? a:1 : expand("%:p")
     " Use the calling program's command
     let l:com = printf(b:breptile_runfmt, l:filename)
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, l:com)
 endfunction
 "}}}
 function! breptile#TmuxSend(pane, text) abort "{{{
+    if !s:IsValidPane()
+        return
+    endif
     " Send command NOT literally, do not send carriage return
     let l:com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
     call system(l:com)
 endfunction
 "}}}
 function! breptile#TmuxSendwithReturn(pane, text) abort "{{{
+    if !s:IsValidPane()
+        return
+    endif
     " Send command literally, and then send carriage return keystroke
     let l:litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
     let l:creturn = "tmux send-keys -t '" . a:pane . "' C-m"
@@ -137,6 +134,11 @@ function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
     if b:breptile_tmuxpane[:4] ==# "Usage"
         echoe "tpgrep error!"
     endif
+
+    " Make sure we didn't find vim's pane
+    if b:breptile_tmuxpane ==# g:breptile_vimpane
+        echom "Run BRFindPane!"
+    endif
 endfunction
 "}}}
 function! s:EscapeText(text) abort "{{{
@@ -151,8 +153,7 @@ function! s:EscapeText(text) abort "{{{
 endfunction
 "}}}
 function! s:SendOp(type) abort "{{{
-    if breptile#GetConfig()
-        call s:Warn("WARNING: Program '" . &filetype . "' is not running!")
+    if !s:IsValidPane()
         return
     endif
 
@@ -181,6 +182,15 @@ function! s:SendOp(type) abort "{{{
     let @@ = reg_save
 endfunction
 "}}}
+function! s:IsValidPane(...) "{{{
+    let l:pane = a:0 ? a:1 : b:breptile_tmuxpane
+    let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+    if !l:test
+        call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRFindPane.")
+    endif
+    return l:test
+endfunction
+"}}]
 function! s:Warn(str) abort "{{{
     echohl WarningMsg | echom a:str | echohl None
     return

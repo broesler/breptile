@@ -23,6 +23,11 @@ if !exists("g:breptile_usetpgrep")
     let g:breptile_usetpgrep = 0
 endif
 
+if !exists("g:breptile_vimpane")
+    " Track vim's pane, so we don't accidentally send commands to it
+    let g:breptile_vimpane = system("tpgrep me")[:-2]
+endif
+
 "}}}--------------------------------------------------------------------------
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
@@ -31,7 +36,7 @@ command! -nargs=? -complete=file BRRunScript update | call breptile#RunScript(<f
 
 " Get the configuration variables
 " TODO create <bang> version that forces update even if we have an existing b:breptile_tmuxpane
-command! BRGetConfig call breptile#GetConfig()
+command! -bang BRGetConfig call breptile#GetConfig(<bang>0)
 
 " Find program pane manually (give tpgrep_pat)
 command! -nargs=? BRFindPane call breptile#UpdateProgramPane(<f-args>)
@@ -40,6 +45,7 @@ command! -nargs=? BRFindPane call breptile#UpdateProgramPane(<f-args>)
 command! -count BRSendCount call breptile#SendCount(<count>)
 command! -range -bar BRSendRange  <line1>,<line2>call breptile#SendRange()
 
+" TODO two commands: one with b:breptile_tmuxpane given, another with 2 args
 " Send arbitrary text to local tmuxpane
 command! -nargs=1 BRTmuxSend call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, <args>)
 
