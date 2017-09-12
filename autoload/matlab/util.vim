@@ -1,5 +1,5 @@
 "=============================================================================
-"     File: util.vim
+"     File: autoload/matlab/util.vim
 "  Created: 10/06/2016, 15:37
 "   Author: Bernie Roesler
 "

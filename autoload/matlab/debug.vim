@@ -44,11 +44,11 @@ endfunction
 "}}}
 function! matlab#debug#Dbcont() "{{{
     " Continue running from breakpoint
-    BRTmuxSend dbcont
+    BRTmuxSend 'dbcont'
 endfunction
 function! matlab#debug#Dbquit() "{{{
     " Send dbquit to matlab
-    BRTmuxSend dbquit
+    BRTmuxSend 'dbquit'
     silent! sign unplace 1
     set ma
 endfunction
@@ -62,12 +62,12 @@ endfunction
 "}}}
 function! matlab#debug#Dbstatus() "{{{
     " Show all debugging stops
-    BRTmuxSend dbstatus
+    BRTmuxSend 'dbstatus'
 endfunction
 "}}}
 function! matlab#debug#Dbstep() "{{{
     silent! sign unplace 1
-    BRTmuxSend dbstep
+    BRTmuxSend 'dbstep'
 
     " Return line on which debugger has stopped
     "    Read MATLAB window debugger output i.e.:

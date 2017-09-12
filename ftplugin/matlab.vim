@@ -46,8 +46,6 @@ command! -buffer -bar MatlabDbstatus   :call matlab#debug#Dbstatus()
 command! -buffer -bar MatlabDbstep     :call matlab#debug#Dbstep()
 
 if g:breptile_mapkeys_matlab "{{{
-    " TODO move these 'ts -t' maps to functions using "TmuxSend" (and make
-    " that function globally available, for generally sending it)
     " Syntax checking:
     nnoremap <buffer> <localleader>L :MatlabLintScript<CR>
 
@@ -63,12 +61,13 @@ if g:breptile_mapkeys_matlab "{{{
 
     " Call Matlab help on current word, or whos on variable
     " TODO include 'whodat.m' in package
+    " TODO abstract these commands to functions "MatlabHelp", etc. 
     nnoremap <silent> <buffer> <localleader>h :BRTmuxSend "help <C-R><C-W>"<CR>
     nnoremap <silent> <buffer> <localleader>w :BRTmuxSend "whodat <C-R><C-W>"<CR>
-    nnoremap <silent> <buffer> <localleader>w :BRTmuxSend whodat<CR>
+    nnoremap <silent> <buffer> <localleader>W :BRTmuxSend "whodat"<CR>
     " Standard usage:
     " nnoremap <silent> <buffer> <localleader>w :BRTmuxSend "whos <C-R><C-W>"<CR>
-    " nnoremap <silent> <buffer> <localleader>w :BRTmuxSend whos<CR>
+    " nnoremap <silent> <buffer> <localleader>W :BRTmuxSend whos<CR>
 
     " display variable in console
     nnoremap <buffer> <localleader><CR> :BRTmuxSend "<C-R><C-W>"<CR>
