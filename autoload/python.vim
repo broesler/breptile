@@ -10,9 +10,14 @@
 "     finish
 " endif
 
+function! python#PythonCd() "{{{
+    let l:com = "cd '" . expand('%:p:h') . "'"
+    BRTmuxSend l:com
+endfunction
+"}}}
 function! python#PythonRunI() "{{{
     " Run python script interactively
-    BRTmuxSend 'python -i ''' . expand("%") . ''''
+    BRTmuxSend "python -i '" . expand('%') . "'"
 endfunction
 "}}}
 function! python#PythonDbstop() "{{{

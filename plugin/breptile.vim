@@ -35,7 +35,7 @@ endif
 command! -nargs=? -complete=file BRRunScript update | call breptile#RunScript(<f-args>)
 
 " Get the configuration variables
-" TODO create <bang> version that forces update even if we have an existing b:breptile_tmuxpane
+" TODO include argument for tpgrep_pat to combine UpdateProgramPane
 command! -bang BRGetConfig call breptile#GetConfig(<bang>0)
 
 " Find program pane manually (give tpgrep_pat)

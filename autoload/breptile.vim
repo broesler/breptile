@@ -38,12 +38,17 @@ function! breptile#GetConfig(bang) "{{{
 
 endfunction
 "}}}
+" TODO clean up and clarify GetConfig and UpdateProgramPane... only difference is whether
+" we check for g:breptile_usetpgrep or not? 
 function! breptile#UpdateProgramPane(...) abort "{{{
-    if a:0 == 0
-        call s:FindProgramPane(b:breptile_tpgrep_pat)
-    else
-        call s:FindProgramPane(a:1)
+    if !exists("b:breptile_tpgrep_pat") || (strlen(b:breptile_tpgrep_pat) == 0)
+        " error! the user said not to use tpgrep, and we couldn't find a pane
+        call s:Warn("breptile#GetConfig() failed to find a pane!")
+        return 2    
     endif
+
+    let l:pat = a:0 ? a:1 : b:breptile_tpgrep_pat
+    call s:FindProgramPane(l:pat)
 
     if strlen(b:breptile_tmuxpane) > 0
         echom "Found program '" . &filetype 
@@ -123,8 +128,9 @@ function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
     let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
 
     " Include pattern to match time, so user only has to grep for program name
-    let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} " . a:breptile_tpgrep_pat . "'"
-    " Search within window:
+    " let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} " . a:breptile_tpgrep_pat . "'"
+    let l:pat = a:breptile_tpgrep_pat
+    " Search within window (no -s flag):
     " let l:syscom = 'tpgrep -t ' . l:tmux_window . ' ' . l:pat
     " Search within session:
     let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
@@ -137,7 +143,7 @@ function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
 
     " Make sure we didn't find vim's pane
     if b:breptile_tmuxpane ==# g:breptile_vimpane
-        echom "Run BRFindPane!"
+        let b:breptile_tmuxpane = ''
     endif
 endfunction
 "}}}
@@ -183,8 +189,12 @@ function! s:SendOp(type) abort "{{{
 endfunction
 "}}}
 function! s:IsValidPane(...) "{{{
-    let l:pane = a:0 ? a:1 : b:breptile_tmuxpane
-    let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+    if !exists("b:breptile_tmuxpane") || (strlen(b:breptile_tmuxpane) == 0)
+        let l:test = 0
+    else
+        let l:pane = a:0 ? a:1 : b:breptile_tmuxpane
+        let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+    endif
     if !l:test
         call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRFindPane.")
     endif

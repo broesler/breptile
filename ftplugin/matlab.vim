@@ -33,7 +33,6 @@ let b:matlab_errorformat="%WWarning: %m,%Z> in %f (line %l),"
 "}}}--------------------------------------------------------------------------
 "       Commands and Keymaps {{{
 "-----------------------------------------------------------------------------
-
 command! -buffer -bar MatlabCd         :call matlab#util#MatlabCd()
 command! -buffer -bar MatlabLintScript :call matlab#util#MatlabLintScript()
 command! -buffer -bar MatlabDbstop     :call matlab#debug#Dbstop()
