@@ -11,8 +11,7 @@
 " endif
 
 function! python#PythonCd() "{{{
-    let l:com = "cd '" . expand('%:p:h') . "'"
-    BRTmuxSend l:com
+     BRTmuxSend "cd '" . expand('%:p:h') . "'"
 endfunction
 "}}}
 function! python#PythonRunI() "{{{
