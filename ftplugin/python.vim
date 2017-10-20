@@ -34,13 +34,21 @@ command! -buffer -bar PythonRunI   :call python#PythonRunI()
 command! -buffer -bar PythonDbstop :call python#PythonDbstop() 
 
 if g:breptile_mapkeys_python "{{{
-    nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
-    nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
+    " Change to current directory
     nnoremap <buffer> <LocalLeader>d :PythonCd<CR>
+    nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
+
+    " Debugging
+    nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
+
+    " Get help!
+    nnoremap <silent> <buffer> <localleader>h :BRTmuxSend 'help(''<C-R><C-W>'')'<CR>
+    nnoremap <silent> <buffer> <localleader>? :BRTmuxSend '<C-R><C-W>?'<CR>
     nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%who'<CR>
 
     " TODO Mappings for:
-    "   -- (myword)? or ??
+    "   -- (myword)??
+    " TODO function to call help on visual mode selection (i.e. gevent.spawn)
 endif
 "}}}
 

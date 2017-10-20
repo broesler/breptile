@@ -41,9 +41,11 @@ endfunction
 " TODO clean up and clarify GetConfig and UpdateProgramPane... only difference is whether
 " we check for g:breptile_usetpgrep or not? 
 function! breptile#UpdateProgramPane(...) abort "{{{
+    let l:warn_str = "breptile#GetConfig() failed to find a pane for " 
+                \. &filetype . "!"
     if !exists("b:breptile_tpgrep_pat") || (strlen(b:breptile_tpgrep_pat) == 0)
         " error! the user said not to use tpgrep, and we couldn't find a pane
-        call s:Warn("breptile#GetConfig() failed to find a pane!")
+        call s:Warn(l:warn_str)
         return 2    
     endif
 
@@ -55,8 +57,8 @@ function! breptile#UpdateProgramPane(...) abort "{{{
                     \ . "' running in pane " . b:breptile_tmuxpane
         return 0    " We have a pane!
     else
-        " error! the user said not to use tpgrep, and we couldn't find a pane
-        call s:Warn("breptile#GetConfig() failed to find a pane!")
+        " error! the user gave a pattern, but we couldn't find a pane
+        call s:Warn(l:warn_str)
         return 2    
     endif
 endfunction
@@ -200,7 +202,7 @@ function! s:IsValidPane(...) "{{{
     endif
     return l:test
 endfunction
-"}}]
+"}}}
 function! s:Warn(str) abort "{{{
     echohl WarningMsg | echom a:str | echohl None
     return
