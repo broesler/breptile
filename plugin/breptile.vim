@@ -31,6 +31,7 @@ endif
 "}}}--------------------------------------------------------------------------
 "       Commands and Key maps {{{
 "-----------------------------------------------------------------------------
+" TODO add these commands to documentation and remove comments to clean up
 " Run the entire script
 command! -nargs=? -complete=file BRRunScript update | call breptile#RunScript(<f-args>)
 
@@ -51,6 +52,7 @@ command! -nargs=1 BRTmuxSend call breptile#TmuxSendwithReturn(b:breptile_tmuxpan
 
 " User uses these maps in their vimrc:
 if g:breptile_mapkeys
+    " TODO use :exe "nmap ... " . g:jupyter#user_command . "<Plug>etc"
     " ALLOW recursion here so that <Plug>s work properly
     nmap <silent> <localleader>e <Plug>BRSendOpNorm
     vmap <silent> <localleader>e <Plug>BRSendOpVis
@@ -63,7 +65,7 @@ if g:breptile_usetpgrep
    " Set up autocmd to find the pane running the program
    augroup BRFindPane
        autocmd!
-       autocmd Filetype gnuplot,matlab,python,sh,scheme BRGetConfig
+       autocmd Filetype gnuplot,matlab,sh,scheme BRGetConfig
    augroup END
 else
     " Just call it once
