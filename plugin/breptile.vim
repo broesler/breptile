@@ -8,9 +8,9 @@
 "
 "=============================================================================
 " Comment out to reload while debugging
-if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
-  finish
-endif
+" if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
+"   finish
+" endif
 
 "-----------------------------------------------------------------------------
 "       Configuration  {{{
@@ -25,7 +25,7 @@ endif
 
 if !exists("g:breptile_vimpane")
     " Track vim's pane, so we don't accidentally send commands to it
-    let g:breptile_vimpane = system("tpgrep me")[:-2]
+    let g:breptile_vimpane = system("tpgrep vim")[:-2]
 endif
 
 "}}}--------------------------------------------------------------------------
