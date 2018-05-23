@@ -13,57 +13,48 @@ endif
 "-----------------------------------------------------------------------------
 "       Public API 
 "-----------------------------------------------------------------------------
-function! breptile#GetConfig(bang) "{{{
-    " if GetConfig is called with a "true" input, look for a pane regardless
-    " of whether we already have one or not
+function! breptile#GetConfig(bang, ...) abort 
     if !a:bang && exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
         return 0    " no updates to be made, carry on
     endif
 
     let b:breptile_tmuxpane = ''
 
-    " If we don't have a pane to use, find one. Prioritize tpgrep over global
-    " default set by user
-    if g:breptile_usetpgrep && exists("b:breptile_tpgrep_pat")
-        call s:FindProgramPane(b:breptile_tpgrep_pat)
-    endif
-
-    if strlen(b:breptile_tmuxpane) > 0
-        return 0    " We have a pane!
+    if a:0 
+        let l:pat = a:1
+    elseif exists(b:breptile_tpgrep_pat) || strlen(b:breptile_tpgrep_pat) > 0
+        let l:pat = b:breptile_tpgrep_pat
     else
-        " error! the user said not to use tpgrep, and we couldn't find a pane
-        " call s:Warn("breptile#GetConfig() failed to find a pane! Run BRFindPane.")
-        return 2    
+        call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
+        return 1
     endif
 
-endfunction
-"}}}
-" TODO clean up and clarify GetConfig and UpdateProgramPane... only difference is whether
-" we check for g:breptile_usetpgrep or not? 
-function! breptile#UpdateProgramPane(...) abort "{{{
-    let l:warn_str = "breptile#GetConfig() failed to find a pane for " 
-                \. &filetype . "!"
-    if !exists("b:breptile_tpgrep_pat") || (strlen(b:breptile_tpgrep_pat) == 0)
-        " error! the user said not to use tpgrep, and we couldn't find a pane
-        call s:Warn(l:warn_str)
-        return 2    
+    " If we don't have a pane to use, find one.
+    if g:breptile_usetpgrep || a:bang
+        call s:FindProgramPane(l:pat)
     endif
 
-    let l:pat = a:0 ? a:1 : b:breptile_tpgrep_pat
-    call s:FindProgramPane(l:pat)
-
-    if strlen(b:breptile_tmuxpane) > 0
-        echom "Found program '" . &filetype 
-                    \ . "' running in pane " . b:breptile_tmuxpane
-        return 0    " We have a pane!
+    if a:bang
+        let l:verbose = 1
     else
-        " error! the user gave a pattern, but we couldn't find a pane
-        call s:Warn(l:warn_str)
+        let l:verbose = a:0 > 1 ? a:2 : 0
+    endif
+
+    if strlen(b:breptile_tmuxpane) > 0  " We have a pane!
+        if l:verbose
+            echom "Found program '" . &filetype 
+              \ . "' running in pane " . b:breptile_tmuxpane
+        endif
+        return 0
+    else
+        if l:verbose
+            call s:Warn("breptile#GetConfig() failed to find a pane!")
+        endif
         return 2    
     endif
 endfunction
-" }}}
-function! breptile#SendRange() range abort "{{{
+
+function! breptile#SendRange() range abort 
     if !s:IsValidPane()
         return
     endif
@@ -72,8 +63,8 @@ function! breptile#SendRange() range abort "{{{
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
-" }}}
-function! breptile#SendCount(count) abort "{{{
+
+function! breptile#SendCount(count) abort 
     if !s:IsValidPane()
         return
     endif
@@ -82,8 +73,8 @@ function! breptile#SendCount(count) abort "{{{
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
     let @@ = reg_save
 endfunction
-" }}}
-function! breptile#RunScript(...) abort "{{{
+
+function! breptile#RunScript(...) abort 
     if !s:IsValidPane()
         return
     endif
@@ -93,8 +84,8 @@ function! breptile#RunScript(...) abort "{{{
     let l:com = printf(b:breptile_runfmt, l:filename)
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, l:com)
 endfunction
-"}}}
-function! breptile#TmuxSend(pane, text) abort "{{{
+
+function! breptile#TmuxSend(pane, text) abort 
     if !s:IsValidPane()
         return
     endif
@@ -102,8 +93,8 @@ function! breptile#TmuxSend(pane, text) abort "{{{
     let l:com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
     call system(l:com)
 endfunction
-"}}}
-function! breptile#TmuxSendwithReturn(pane, text) abort "{{{
+
+function! breptile#TmuxSendwithReturn(pane, text) abort 
     if !s:IsValidPane()
         return
     endif
@@ -112,44 +103,41 @@ function! breptile#TmuxSendwithReturn(pane, text) abort "{{{
     let l:creturn = "tmux send-keys -t '" . a:pane . "' C-m"
     call system(l:litkeys . ' && ' . l:creturn)
 endfunction
-"}}}
+
 
 "-----------------------------------------------------------------------------
 "       Private API 
 "-----------------------------------------------------------------------------
-function! s:FindProgramPane(breptile_tpgrep_pat) abort "{{{
-    if strlen(a:breptile_tpgrep_pat) == 0
+function! s:FindProgramPane(tpgrep_pat) abort 
+    if strlen(a:tpgrep_pat) == 0
         call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
         return
     endif
 
-    " TODO add option to search within session
     " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
     " [:-2] strips newline returned by 'system'
     " Get current window ID:
     let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
 
-    " Include pattern to match time, so user only has to grep for program name
-    " let l:pat = "'[0-9]:[0-9]{2}.[0-9]{2} " . a:breptile_tpgrep_pat . "'"
-    let l:pat = a:breptile_tpgrep_pat
-    " Search within window (no -s flag):
-    " let l:syscom = 'tpgrep -t ' . l:tmux_window . ' ' . l:pat
-    " Search within session:
+    " Search within session (remove -s to search within window )
+    let l:pat = a:tpgrep_pat
     let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
     let b:breptile_tmuxpane = system(l:syscom)[:-2]
 
     " Error checking
-    if b:breptile_tmuxpane[:4] ==# "Usage"
+    if v:shell_error
         echoe "tpgrep error!"
     endif
 
     " Make sure we didn't find vim's pane
+    " WARNING this line will break if using manual 'bottom-left', etc. Perhaps
+    " come up with a way to normalize pane references??
     if b:breptile_tmuxpane ==# g:breptile_vimpane
         let b:breptile_tmuxpane = ''
     endif
 endfunction
-"}}}
-function! s:EscapeText(text) abort "{{{
+
+function! s:EscapeText(text) abort 
     let l:text = a:text
     " may only need for matlab:
     let l:text = substitute(l:text, ';', '; ', 'g') 
@@ -159,8 +147,8 @@ function! s:EscapeText(text) abort "{{{
 
     return l:text
 endfunction
-"}}}
-function! s:SendOp(type) abort "{{{
+
+function! s:SendOp(type) abort 
     if !s:IsValidPane()
         return
     endif
@@ -189,8 +177,8 @@ function! s:SendOp(type) abort "{{{
     let &selection = sel_save
     let @@ = reg_save
 endfunction
-"}}}
-function! s:IsValidPane(...) "{{{
+
+function! s:IsValidPane(...) 
     if !exists("b:breptile_tmuxpane") || (strlen(b:breptile_tmuxpane) == 0)
         let l:test = 0
     else
@@ -198,24 +186,23 @@ function! s:IsValidPane(...) "{{{
         let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
     endif
     if !l:test
-        call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRFindPane.")
+        call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRGetConfig.")
     endif
     return l:test
 endfunction
-"}}}
-function! s:Warn(str) abort "{{{
+
+function! s:Warn(str) abort 
     echohl WarningMsg | echom a:str | echohl None
     return
 endfunction
-"}}}
+
 
 "-----------------------------------------------------------------------------
 "        Create <Plug> for user mappings
 "-----------------------------------------------------------------------------
-" Send text operator{{{
+" Send text operator
 noremap <silent> <Plug>BRSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
 noremap <silent> <Plug>BRSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
-"}}}
 
 let g:autoloaded_breptile = 1
 "=============================================================================

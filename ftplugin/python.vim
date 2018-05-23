@@ -7,36 +7,28 @@
 "
 "=============================================================================
 " Configuration {{{
-if exists("g:breptile_python_useinterp") && g:breptile_python_useinterp == 1
-    " Search for python interpreter pane
-    let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_python', 'i?python')
-    " Python code to run a script in the interpreter
-    " let b:breptile_runfmt = "with open('%s', 'r') as f:\n    exec(f.read())\n"
-    let b:breptile_runfmt = "%%run '%s'"
-else " just use shell
-    let g:python_pane = 'bottom-left'       
-    let b:breptile_runfmt = "python '%s'"
+call python#PythonConfig()
+
+if !exists('g:breptile_mapkeys_python')
+    let g:breptile_mapkeys_python = 1
 endif
 
-" Run format and pane can still be overridden by user
-let b:breptile_runfmt = get(g:, "g:breptile_python_runfmt", b:breptile_runfmt)
-
-" Directly set pane if it exists and is non-empty
-if exists("g:python_pane") && strlen("g:python_pane") > 0
-    let b:breptile_tmuxpane = g:python_pane
-endif
-
-"}}}-------------------------------------------------------------------------- 
+"}}}--------------------------------------------------------------------------
 "        " Commands and Keymaps {{{
 "-----------------------------------------------------------------------------
-command! -buffer -bar PythonCd     :call python#PythonCd()
-command! -buffer -bar PythonRunI   :call python#PythonRunI() 
-command! -buffer -bar PythonDbstop :call python#PythonDbstop() 
+command! -buffer PythonUseShell :call python#UseShell()
+
+command! -buffer -bar PythonCd :call python#PythonCd()
+
+command! -buffer PythonRunI   :call python#PythonRunI()
+command! -buffer PythonDbstop :call python#PythonDbstop()
+command! -buffer -bang PythonDebug  :call python#PythonDebug(<bang>0)
 
 if g:breptile_mapkeys_python "{{{
     " Change to current directory
     nnoremap <buffer> <LocalLeader>d :PythonCd<CR>
     nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
+    nnoremap <buffer> <LocalLeader>D :PythonDebug<CR>
 
     " Debugging
     nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
@@ -46,12 +38,10 @@ if g:breptile_mapkeys_python "{{{
     nnoremap <silent> <buffer> <localleader>? :BRTmuxSend '<C-R><C-W>?'<CR>
     nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%who'<CR>
 
-    " TODO Mappings for:
-    "   -- (myword)??
     " TODO function to call help on visual mode selection (i.e. gevent.spawn)
 endif
 "}}}
 
-" }}}
+"}}}
 "=============================================================================
 "=============================================================================
