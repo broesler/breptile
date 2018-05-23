@@ -19,7 +19,7 @@ if exists("g:matlab_pane") && strlen("g:matlab_pane") > 0
 endif
 
 if !exists("g:breptile_mapkeys_matlab")
-    let g:breptile_mapkeys_matlab = 0
+    let g:breptile_mapkeys_matlab = 1
 endif
 
 " Search pattern for gnuplot pane
