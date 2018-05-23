@@ -67,13 +67,13 @@ function! python#PythonDebug(bang) abort
         let &efm =  '%C %.%#,'
         let &efm .= '%C-%.%#> %l %.%#,'
         let &efm .= '%E%f in %m,'
-        let &efm .= '%Z%\(%[%^ ]:%\)%\@=%m,'
+        let &efm .= '%Z%\(%[%^ :]: %\)%\@=%m,'
         let &efm .= '%-G%\s%#'
     else
         " Non-ipython message, see ":h errorformat-multi-line"
         let &efm =  '%C    %.%#,'
         let &efm .= '%E  File "%f"\, line %l\, %m,'
-        let &efm .= '%Z%[%^ ]%\@=%m'
+        let &efm .= '%Z%\(%[%^ :]: %\)%\@=%m'
     endif
 
     " TODO add to configuration options + documentation
