@@ -10,6 +10,9 @@
 "     finish
 " endif
 
+"----------------------------------------------------------------------------- 
+"       Public API 
+"-----------------------------------------------------------------------------
 function! python#PythonConfig()
     " Determine whether to use python interpreter or not:
     "   0 == no interpreter, 1 == python, 2 == ipython
@@ -58,8 +61,8 @@ endfunction
 function! python#PythonDbstop()
     " TODO take line number as argument
     " Set a debugging breakpoint for use with pdb
-    let l:pdb = b:breptile_python_interp == 2 ? 'ipdb' : 'pdb'
-    execute "normal! Oimport " . l:pdb . ';' l:pdb ".set_trace()j"
+    let l:pdb = g:breptile_python_interp == 2 ? 'ipdb' : 'pdb'
+    execute 'normal! Oimport ' . l:pdb . '; ' . l:pdb . ".set_trace()j"
 endfunction
 
 function! python#PythonDebug(bang) abort
@@ -99,6 +102,18 @@ function! python#UseShell() abort
     call python#PythonConfig()
     BRGetConfig
 endfunction
+
+"----------------------------------------------------------------------------- 
+"       Private API 
+"-----------------------------------------------------------------------------
+function! s:PyHelp(type) abort
+    let l:string = breptile#GetOp(a:type)
+    execute "BRTmuxSend '" . l:string . "?'"
+endfunction
+
+" Send text operator
+noremap <silent> <Plug>PyHelpNorm :set operatorfunc=<SID>PyHelp<CR>g@
+noremap <silent> <Plug>PyHelpVis  :<C-u>call <SID>PyHelp(visualmode())<CR>
 
 let g:loaded_breptile_python_util = 1
 " vim:fdm=syntax

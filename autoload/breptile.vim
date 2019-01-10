@@ -14,7 +14,9 @@ endif
 "       Public API 
 "-----------------------------------------------------------------------------
 function! breptile#GetConfig(bang, ...) abort 
-    if !a:bang && exists("b:breptile_tmuxpane") && (strlen(b:breptile_tmuxpane) > 0)
+    if !a:bang 
+       \ && exists("b:breptile_tmuxpane") 
+       \ && (strlen(b:breptile_tmuxpane) > 0)
         return 0    " no updates to be made, carry on
     endif
 
@@ -22,7 +24,7 @@ function! breptile#GetConfig(bang, ...) abort
 
     if a:0 
         let l:pat = a:1
-    elseif exists(b:breptile_tpgrep_pat) || strlen(b:breptile_tpgrep_pat) > 0
+    elseif exists(b:breptile_tpgrep_pat) || (strlen(b:breptile_tpgrep_pat) > 0)
         let l:pat = b:breptile_tpgrep_pat
     else
         call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
@@ -104,59 +106,7 @@ function! breptile#TmuxSendwithReturn(pane, text) abort
     call system(l:litkeys . ' && ' . l:creturn)
 endfunction
 
-
-"-----------------------------------------------------------------------------
-"       Private API 
-"-----------------------------------------------------------------------------
-function! s:FindProgramPane(tpgrep_pat) abort 
-    if strlen(a:tpgrep_pat) == 0
-        call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
-        return
-    endif
-
-    " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
-    " [:-2] strips newline returned by 'system'
-    " Get current window ID:
-    let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
-
-    " Search within session (remove -s to search within window )
-    let l:pat = a:tpgrep_pat
-    let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
-    let b:breptile_tmuxpane = system(l:syscom)[:-2]
-
-    " Error checking
-    if v:shell_error
-        echoe "tpgrep error!"
-    endif
-
-    " Make sure we didn't find vim's pane
-    " WARNING this line will break if using manual 'bottom-left', etc. Perhaps
-    " come up with a way to normalize pane references??
-    if b:breptile_tmuxpane ==# g:breptile_vimpane
-        let b:breptile_tmuxpane = ''
-    endif
-endfunction
-
-function! s:EscapeText(text) abort 
-    let l:text = a:text
-    " may only need for matlab:
-    let l:text = substitute(l:text, ';', '; ', 'g') 
-    " Escape '%' so vim doesn't insert filename
-    let l:text = substitute(l:text, '%', '\%', 'g')
-    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
-
-    return l:text
-endfunction
-
-function! s:SendOp(type) abort 
-    if !s:IsValidPane()
-        return
-    endif
-    let l:string = s:GetOp(a:type)
-    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(l:string))
-endfunction
-
-function! s:GetOp(type) abort
+function! breptile#GetOp(type) abort
     try
         " Get string from g@ operator
         " Selection needs to include start and end points 
@@ -183,6 +133,57 @@ function! s:GetOp(type) abort
         let &selection = l:sel_save
         let @@ = l:reg_save
     endtry
+endfunction
+
+"-----------------------------------------------------------------------------
+"       Private API 
+"-----------------------------------------------------------------------------
+function! s:FindProgramPane(tpgrep_pat) abort 
+    if strlen(a:tpgrep_pat) == 0
+        call s:Warn("WARNING: b:breptile_tpgrep_pat is empty!")
+        return
+    endif
+
+    " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
+    " [:-2] strips newline returned by 'system'
+    " Get current window ID:
+    let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
+
+    " Search within session (remove -s to search within window )
+    let l:pat = a:tpgrep_pat
+    let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
+    let b:breptile_tmuxpane = system(l:syscom)[:-2]
+
+    " Error checking
+    if v:shell_error
+        echoe "tpgrep error!"
+    endif
+
+    " Make sure we didn't find vim's pane
+    " TODO this line will break if using manual 'bottom-left', etc. Perhaps
+    " come up with a way to normalize pane references??
+    if b:breptile_tmuxpane ==# g:breptile_vimpane
+        let b:breptile_tmuxpane = ''
+    endif
+endfunction
+
+function! s:EscapeText(text) abort 
+    let l:text = a:text
+    " may only need for matlab:
+    let l:text = substitute(l:text, ';', '; ', 'g') 
+    " Escape '%' so vim doesn't insert filename
+    let l:text = substitute(l:text, '%', '\%', 'g')
+    let l:text = substitute(l:text, "\n", "\<CR>", 'g')
+
+    return l:text
+endfunction
+
+function! s:SendOp(type) abort 
+    if !s:IsValidPane()
+        return
+    endif
+    let l:string = breptile#GetOp(a:type)
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(l:string))
 endfunction
 
 function! s:IsValidPane(...) 

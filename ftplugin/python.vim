@@ -27,18 +27,19 @@ command! -buffer -bang PythonDebug  :call python#PythonDebug(<bang>0)
 if g:breptile_mapkeys_python "{{{
     " Change to current directory
     nnoremap <buffer> <LocalLeader>d :PythonCd<CR>
-    nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
-    nnoremap <buffer> <LocalLeader>D :PythonDebug<CR>
 
     " Debugging
     nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
+    nnoremap <buffer> <LocalLeader>D :PythonDebug<CR>
+    nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
+
+    " Variable info
+    nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%whos'<CR>
 
     " Get help!
     nnoremap <silent> <buffer> <localleader>h :BRTmuxSend 'help(''<C-R><C-W>'')'<CR>
-    nnoremap <silent> <buffer> <localleader>? :BRTmuxSend '<C-R><C-W>?'<CR>
-    nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%who'<CR>
-
-    " TODO function to call help on visual mode selection (i.e. gevent.spawn)
+    nmap <silent> <localleader>? <Plug>PyHelpNorm
+    vmap <silent> <localleader>? <Plug>PyHelpVis
 endif
 "}}}
 
