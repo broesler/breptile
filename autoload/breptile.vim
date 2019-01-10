@@ -58,20 +58,20 @@ function! breptile#SendRange() range abort
     if !s:IsValidPane()
         return
     endif
-    let reg_save = @@
+    let l:reg_save = @@
     silent execute a:firstline . ',' . a:lastline . 'y'
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
-    let @@ = reg_save
+    let @@ = l:reg_save
 endfunction
 
 function! breptile#SendCount(count) abort 
     if !s:IsValidPane()
         return
     endif
-    let reg_save = @@
+    let l:reg_save = @@
     silent execute 'normal! ' . a:count . 'yy'
     call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
-    let @@ = reg_save
+    let @@ = l:reg_save
 endfunction
 
 function! breptile#RunScript(...) abort 
@@ -152,30 +152,37 @@ function! s:SendOp(type) abort
     if !s:IsValidPane()
         return
     endif
+    let l:string = s:GetOp(a:type)
+    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(l:string))
+endfunction
 
-    " Selection needs to include start and end points 
-    let sel_save = &selection
-    let &selection = "inclusive"
-    " function will wipe out unnamed register, so save its contents
-    let reg_save = @@
+function! s:GetOp(type) abort
+    try
+        " Get string from g@ operator
+        " Selection needs to include start and end points 
+        let l:sel_save = &selection
+        let &selection = "inclusive"
+        " function will wipe out unnamed register, so save its contents
+        let l:reg_save = @@
 
-    " copy motion for type (see :help g@)
-    if (a:type ==# 'v') || (a:type ==# 'V')
-        silent execute "normal! gvy"
-    elseif a:type ==# 'char'
-        silent execute "normal! `[v`]y"
-    elseif a:type ==# 'line'
-        silent execute "norma! '[V']y"
-    else
-        " ignore block-visual '<C-v>' 
-        return  
-    endif
+        " copy motion for type (see :help g@)
+        if (a:type ==# 'v') || (a:type ==# 'V')
+            silent execute "normal! gvy"
+        elseif a:type ==# 'char'
+            silent execute "normal! `[v`]y"
+        elseif a:type ==# 'line'
+            silent execute "normal! '[V']y"
+        else
+            " ignore block-visual '<C-v>' 
+            return  
+        endif
 
-    call breptile#TmuxSendwithReturn(b:breptile_tmuxpane, s:EscapeText(@@))
-
-    " Return selection and unnamed register to previous values
-    let &selection = sel_save
-    let @@ = reg_save
+        return @@
+    finally
+        " Return selection and unnamed register to previous values
+        let &selection = l:sel_save
+        let @@ = l:reg_save
+    endtry
 endfunction
 
 function! s:IsValidPane(...) 
@@ -195,7 +202,6 @@ function! s:Warn(str) abort
     echohl WarningMsg | echom a:str | echohl None
     return
 endfunction
-
 
 "-----------------------------------------------------------------------------
 "        Create <Plug> for user mappings
