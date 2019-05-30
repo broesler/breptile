@@ -22,6 +22,14 @@ if !exists("g:breptile_mapkeys_matlab")
     let g:breptile_mapkeys_matlab = 1
 endif
 
+if !exists("g:mlint_path")
+    let s:ext = ''
+    if $MATLAB_PATH =~ 'win64'
+        let s:ext = '.exe'
+    endif
+    let g:mlint_path = shellescape($MATLAB_PATH)  . "/mlint" . s:ext
+endif
+
 " Search pattern for gnuplot pane
 let b:breptile_tpgrep_pat = get(g:, 'breptile_tpgrep_pat_matlab', '/Applications/[M]ATLAB')
 

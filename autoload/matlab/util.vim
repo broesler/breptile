@@ -33,8 +33,8 @@ function! matlab#util#MatlabLintScript() "{{{
     " ..
     " ========== <empty-string> ==========
 
-    let &l:makeprg="/Applications/MATLAB_R2016b.app/bin/maci64/mlint -id "
-                \.shellescape(expand("%:p"))." ''"
+    " NOTE: Expansion to full path caused issues on Ubuntu in Windows
+    let &l:makeprg=g:mlint_path . " -id " . shellescape(expand("%")) . " ''"
 
     " List efm most restrictive to least restrictive patterns
     let &l:errorformat= "%P==========\ %f\ ==========,"
