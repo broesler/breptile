@@ -7,6 +7,7 @@
 "  running commands/scripts in any tmux pane (except the one running vim!).
 "
 "=============================================================================
+"
 if exists("g:loaded_breptile") || &cp || (strlen($TMUX) == 0)
   finish
 endif
@@ -48,6 +49,8 @@ command! -nargs=1 BRTmuxSend call breptile#TmuxSendwithReturn(b:breptile_tmuxpan
 " User uses these maps in their vimrc:
 if g:breptile_mapkeys
     " TODO use :exe "nmap ... " . g:breptile#user_command . "<Plug>etc"
+    " TODO figure out how to make these mappings buffer-local, only for
+    " filetypes that BReptile supports.
     " ALLOW recursion here so that <Plug>s work properly
     nmap <silent> <localleader>e <Plug>BRSendOpNorm
     vmap <silent> <localleader>e <Plug>BRSendOpVis
