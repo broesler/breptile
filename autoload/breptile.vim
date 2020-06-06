@@ -6,9 +6,6 @@
 "  Description: General autoload functions for breptile plugin
 "
 "=============================================================================
-if exists("g:autoloaded_breptile")
-    finish
-endif
 
 "-----------------------------------------------------------------------------
 "       Public API 
@@ -211,6 +208,5 @@ endfunction
 noremap <silent> <Plug>BRSendOpNorm :set operatorfunc=<SID>SendOp<CR>g@
 noremap <silent> <Plug>BRSendOpVis  :<C-u>call <SID>SendOp(visualmode())<CR>
 
-let g:autoloaded_breptile = 1
 "=============================================================================
 "=============================================================================
