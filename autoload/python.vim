@@ -6,9 +6,6 @@
 "  Description: utilities for using vim with the python interpreter
 "
 "=============================================================================
-" if exists('g:loaded_breptile_python_util')
-"     finish
-" endif
 
 "----------------------------------------------------------------------------- 
 "       Public API 
@@ -114,6 +111,3 @@ endfunction
 " Send text operator
 noremap <silent> <Plug>PyHelpNorm :set operatorfunc=<SID>PyHelp<CR>g@
 noremap <silent> <Plug>PyHelpVis  :<C-u>call <SID>PyHelp(visualmode())<CR>
-
-let g:loaded_breptile_python_util = 1
-" vim:fdm=syntax
