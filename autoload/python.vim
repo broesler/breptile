@@ -62,6 +62,18 @@ function! python#PythonDbstop()
     execute 'normal! Oimport ' . l:pdb . '; ' . l:pdb . ".set_trace()j"
 endfunction
 
+function! python#PythonRunTests()
+    " Get the current filename, run 'tests/test_%.py', if it exists
+    let l:filename = expand('%:t')
+    let l:path = expand('%:p:h')
+    let l:test_file = l:path . '/tests/test_' . l:filename
+    if filereadable(l:test_file)
+        breptile#RunScript(l:test_file)
+    else
+        echom "Test file '" . l:test_file . "' does not exist!"
+    endif
+endfunction
+
 function! python#PythonDebug(bang) abort
     if g:breptile_python_interp == 2
         let &efm =  '%C %.%#,'

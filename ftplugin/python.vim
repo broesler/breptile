@@ -24,6 +24,8 @@ command! -buffer PythonRunI   :call python#PythonRunI()
 command! -buffer PythonDbstop :call python#PythonDbstop()
 command! -buffer -bang PythonDebug  :call python#PythonDebug(<bang>0)
 
+command! -buffer PythonRunTests :call python#PythonRunTests()
+
 if g:breptile_mapkeys_python "{{{
     " Change to current directory
     nnoremap <buffer> <LocalLeader>d :PythonCd<CR>
@@ -32,6 +34,8 @@ if g:breptile_mapkeys_python "{{{
     nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
     nnoremap <buffer> <LocalLeader>D :PythonDebug<CR>
     nnoremap <buffer> <LocalLeader>I :PythonRunI<CR>
+
+    nnoremap <buffer> <LocalLeader>T :PythonRunTests<CR>
 
     " Variable info
     nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%whos'<CR>
