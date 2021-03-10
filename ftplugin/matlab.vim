@@ -27,7 +27,7 @@ if !exists("g:mlint_path")
     if $MATLAB_PATH =~ 'win64'
         let s:ext = '.exe'
     endif
-    let g:mlint_path = shellescape($MATLAB_PATH)  . "/mlint" . s:ext
+    let g:mlint_path = shellescape($MATLAB_PATH)  . "mlint" . s:ext
 endif
 
 " Search pattern for gnuplot pane

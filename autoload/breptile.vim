@@ -14,6 +14,8 @@ function! breptile#GetConfig(bang, ...) abort
     if !a:bang 
        \ && exists("b:breptile_tmuxpane") 
        \ && (strlen(b:breptile_tmuxpane) > 0)
+        echom "Program pane '" . b:breptile_tmuxpane
+            \ . "' already set for program '" . &filetype . "'"
         return 0    " no updates to be made, carry on
     endif
 
@@ -33,22 +35,12 @@ function! breptile#GetConfig(bang, ...) abort
         call s:FindProgramPane(l:pat)
     endif
 
-    if a:bang
-        let l:verbose = 1
-    else
-        let l:verbose = a:0 > 1 ? a:2 : 0
-    endif
-
     if strlen(b:breptile_tmuxpane) > 0  " We have a pane!
-        if l:verbose
-            echom "Found program '" . &filetype 
-              \ . "' running in pane " . b:breptile_tmuxpane
-        endif
+        echom "Found program '" . &filetype 
+            \ . "' running in pane " . b:breptile_tmuxpane
         return 0
     else
-        if l:verbose
-            call s:Warn("breptile#GetConfig() failed to find a pane!")
-        endif
+        call s:Warn("breptile#GetConfig() failed to find a pane!")
         return 2    
     endif
 endfunction

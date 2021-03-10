@@ -39,6 +39,9 @@ if g:breptile_mapkeys_python "{{{
 
     " Variable info
     nnoremap <buffer> <LocalLeader>W :BRTmuxSend '%whos'<CR>
+    " TODO create vmap for shape command
+    nnoremap <buffer> <LocalLeader>s :BRTmuxSend '<C-R><C-W>.shape'<CR>
+    nnoremap <buffer> <LocalLeader><CR> :BRTmuxSend '<C-R><C-W>'<CR>
 
     " Get help!
     nnoremap <silent> <buffer> <localleader>h :BRTmuxSend 'help(''<C-R><C-W>'')'<CR>

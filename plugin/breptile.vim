@@ -63,11 +63,11 @@ if g:breptile_usetpgrep
    " Set up autocmd to find the pane running the program
    augroup BRFindPane
        autocmd!
-       autocmd Filetype gnuplot,python,matlab,r,sh,scheme BRGetConfig
+       autocmd Filetype gnuplot,python,matlab,sh,scheme silent! BRGetConfig!
    augroup END
 else
     " Just call it once
-    BRGetConfig
+    silent! BRGetConfig!
 endif
 "}}}
 

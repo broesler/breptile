@@ -49,7 +49,7 @@ endfunction
 
 function! python#PythonCd()
     " TODO take dirname as argument
-     BRTmuxSend "cd '" . expand('%:p:h') . "'"
+     BRTmuxSend "%cd '" . expand('%:p:h') . "'"
 endfunction
 
 function! python#PythonRunI()
