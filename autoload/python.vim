@@ -64,13 +64,17 @@ endfunction
 
 function! python#PythonRunTests()
     " Get the current filename, run 'tests/test_%.py', if it exists
-    let l:filename = expand('%:t')
+    let l:fileroot = expand('%:t')
     let l:path = expand('%:p:h')
-    let l:test_file = l:path . '/tests/test_' . l:filename
+    let l:test_file = l:path . '/tests/test_' . l:fileroot
+    " Or try the actual test script we might be in
+    let l:filename = expand('%:p')
     if filereadable(l:test_file)
         breptile#RunScript(l:test_file)
+    elseif filereadable(l:filename)
+        BRTmuxSend "%run -m pytest " . l:filename
     else
-        echom "Test file '" . l:test_file . "' does not exist!"
+        echom "Test file '" . l:filename . "' does not exist!"
     endif
 endfunction
 
