@@ -10,6 +10,7 @@
 "----------------------------------------------------------------------------- 
 "       Public API 
 "-----------------------------------------------------------------------------
+"" TODO convert to dictionary of defaults like in jupyter-vim
 function! python#PythonConfig()
     " Determine whether to use python interpreter or not:
     "   0 == no interpreter, 1 == python, 2 == ipython
@@ -37,6 +38,8 @@ function! python#PythonConfig()
 
     " Run format and pane can still be overridden by user
     let b:breptile_runfmt = get(g:, 'breptile_python_runfmt', b:breptile_runfmt)
+
+    let b:breptile_python_pytestops = get(g:, 'breptile_python_pytestops', '')
 
     " Directly set pane if it exists and is non-empty
     if exists('g:python_pane') && strlen('g:python_pane') > 0
@@ -72,7 +75,9 @@ function! python#PythonRunTests()
     if filereadable(l:test_file)
         breptile#RunScript(l:test_file)
     elseif filereadable(l:filename)
-        BRTmuxSend "%run -m pytest " . l:filename
+        BRTmuxSend "%run -m pytest "
+                    \. b:breptile_python_pytestops
+                    \. " " . l:filename
     else
         echom "Test file '" . l:filename . "' does not exist!"
     endif
