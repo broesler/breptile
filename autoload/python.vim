@@ -67,20 +67,22 @@ endfunction
 
 function! python#PythonRunTests()
     " Get the current filename, run 'tests/test_%.py', if it exists
-    let l:fileroot = expand('%:t')
-    let l:path = expand('%:p:h')
-    let l:test_file = l:path . '/tests/test_' . l:fileroot
+    let l:test_file1 = expand('%:p:h') . '/tests/test_' . expand('%:t')
+    let l:test_file2 = expand('%:p:h:h') . '/tests/test_' . expand('%:t')
     " Or try the actual test script we might be in
     let l:filename = expand('%:p')
-    if filereadable(l:test_file)
-        breptile#RunScript(l:test_file)
+    if filereadable(l:test_file1)
+        let l:file_to_test = l:test_file1
+    elseif filereadable(l:test_file2)
+        let l:file_to_test = l:test_file2
     elseif filereadable(l:filename)
-        BRTmuxSend "%run -m pytest "
-                    \. b:breptile_python_pytestops
-                    \. " " . l:filename
+        let l:file_to_test = l:filename
     else
         echom "Test file '" . l:filename . "' does not exist!"
     endif
+    BRTmuxSend "%run -m pytest "
+                \. b:breptile_python_pytestops
+                \. " " . l:file_to_test
 endfunction
 
 function! python#PythonDebug(bang) abort
