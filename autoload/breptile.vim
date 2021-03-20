@@ -86,7 +86,8 @@ function! breptile#TmuxSend(pane, text) abort
 endfunction
 
 function! breptile#TmuxSendwithReturn(pane, text) abort 
-    if !s:IsValidPane()
+    if !s:IsValidPane(a:pane)
+        call s:Warn("WARNING: pane '" . a:pane . "' is invalid!")
         return
     endif
     " Send command literally, and then send carriage return keystroke
@@ -176,12 +177,17 @@ function! s:SendOp(type) abort
 endfunction
 
 function! s:IsValidPane(...) 
-    if !exists("b:breptile_tmuxpane") || (strlen(b:breptile_tmuxpane) == 0)
-        let l:test = 0
+    if a:0
+        let l:pane = a:1
     else
-        let l:pane = a:0 ? a:1 : b:breptile_tmuxpane
-        let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+        if exists("b:breptile_tmuxpane")
+            let l:pane = b:breptile_tmuxpane
+        else
+            let l:pane = ''
+        endif
     endif
+    let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+    # TODO test is pane exists in tmux?
     if !l:test
         call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRGetConfig.")
     endif

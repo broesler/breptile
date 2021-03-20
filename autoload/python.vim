@@ -40,6 +40,7 @@ function! python#PythonConfig()
     let b:breptile_runfmt = get(g:, 'breptile_python_runfmt', b:breptile_runfmt)
 
     let b:breptile_python_pytestops = get(g:, 'breptile_python_pytestops', '')
+    let b:breptile_python_pytestpane = get(g:, 'breptile_python_pytestpane', '')
 
     " Directly set pane if it exists and is non-empty
     if exists('g:python_pane') && strlen('g:python_pane') > 0
@@ -66,6 +67,11 @@ function! python#PythonDbstop()
 endfunction
 
 function! python#PythonRunTests()
+    if strlen(b:breptile_python_pytestpane) > 0
+        let l:the_pane = b:breptile_python_pytestpane
+    else
+        let l:the_pane = b:breptile_tmuxpane
+    endif
     " Get the current filename, run 'tests/test_%.py', if it exists
     let l:test_file1 = expand('%:p:h') . '/tests/test_' . expand('%:t')
     let l:test_file2 = expand('%:p:h:h') . '/tests/test_' . expand('%:t')
@@ -80,9 +86,8 @@ function! python#PythonRunTests()
     else
         echom "Test file '" . l:filename . "' does not exist!"
     endif
-    BRTmuxSend "%run -m pytest "
-                \. b:breptile_python_pytestops
-                \. " " . l:file_to_test
+    call breptile#TmuxSendwithReturn(l:the_pane, 
+        \"pytest " . b:breptile_python_pytestops . " " . l:file_to_test)
 endfunction
 
 function! python#PythonDebug(bang) abort
