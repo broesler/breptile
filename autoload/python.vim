@@ -67,6 +67,7 @@ function! python#PythonDbstop()
 endfunction
 
 function! python#PythonRunTests()
+    " TODO allow filename argument
     if strlen(b:breptile_python_pytestpane) > 0
         let l:the_pane = b:breptile_python_pytestpane
     else

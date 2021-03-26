@@ -187,7 +187,7 @@ function! s:IsValidPane(...)
         endif
     endif
     let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
-    # TODO test is pane exists in tmux?
+    " TODO test is pane exists in tmux?
     if !l:test
         call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRGetConfig.")
     endif
