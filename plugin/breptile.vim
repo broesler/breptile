@@ -25,7 +25,7 @@ endif
 
 if !exists('g:breptile_vimpane')
     " Track vim's pane, so we don't accidentally send commands to it
-    let g:breptile_vimpane = system('tpgrep vim')[:-2]
+    let g:breptile_vimpane = trim(system('tpgrep vim'))
 endif
 
 "}}}--------------------------------------------------------------------------
