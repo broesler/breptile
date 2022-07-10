@@ -137,12 +137,12 @@ function! s:FindProgramPane(tpgrep_pat) abort
     " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
     " [:-2] strips newline returned by 'system'
     " Get current window ID:
-    let l:tmux_window = system("tmux display-message -p ''#{window_id}''")[:-2]
+    let l:tmux_window = trim(system("tmux display-message -p ''#{window_id}''"))
 
     " Search within session (remove -s to search within window )
     let l:pat = a:tpgrep_pat
     let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
-    let b:breptile_tmuxpane = system(l:syscom)[:-2]
+    let b:breptile_tmuxpane = trim(system(l:syscom))
 
     " Error checking
     if v:shell_error
