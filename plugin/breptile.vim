@@ -23,10 +23,10 @@ if !exists('g:breptile_usetpgrep')
     let g:breptile_usetpgrep = 1
 endif
 
-if !exists('g:breptile_vimpane')
-    " Track vim's pane, so we don't accidentally send commands to it
-    let g:breptile_vimpane = trim(system('tpgrep vim'))
-endif
+" if !exists('g:breptile_vimpane')
+"     " Track vim's pane, so we don't accidentally send commands to it
+"     let g:breptile_vimpane = trim(system('tpgrep vim'))
+" endif
 
 "}}}--------------------------------------------------------------------------
 "       Commands and Key maps {{{
@@ -59,16 +59,18 @@ if g:breptile_mapkeys
 endif
 "}}}
 " Set up autocmd to find the pane {{{
-if g:breptile_usetpgrep 
-   " Set up autocmd to find the pane running the program
-   augroup BRFindPane
-       autocmd!
-       autocmd Filetype gnuplot,python,matlab,sh,scheme silent! BRGetConfig!
-   augroup END
-else
-    " Just call it once
-    silent! BRGetConfig!
-endif
+" FIXME the find pane command is SLOW ~0.9s via vim system() call
+" Can set up an async command to run this in the background if needed
+" if g:breptile_usetpgrep 
+"    " Set up autocmd to find the pane running the program
+"    augroup BRFindPane
+"        autocmd!
+"        autocmd Filetype gnuplot,python,matlab,sh,scheme silent! BRGetConfig!
+"    augroup END
+" else
+"     " Just call it once
+"     silent! BRGetConfig!
+" endif
 "}}}
 
 let g:loaded_breptile = 1

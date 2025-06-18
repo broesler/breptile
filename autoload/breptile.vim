@@ -134,6 +134,8 @@ function! s:FindProgramPane(tpgrep_pat) abort
         return
     endif
 
+    " FIXME this line is SUPER SLOW ~0.9s! -- see ChatGPT on lazy loading
+    " and using vim's job control for async processing
     " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
     " [:-2] strips newline returned by 'system'
     " Get current window ID:
@@ -142,6 +144,7 @@ function! s:FindProgramPane(tpgrep_pat) abort
     " Search within session (remove -s to search within window )
     let l:pat = a:tpgrep_pat
     let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
+    " FIXME this line is SUPER SLOW ~0.8s!
     let b:breptile_tmuxpane = trim(system(l:syscom))
 
     " Error checking
@@ -152,9 +155,9 @@ function! s:FindProgramPane(tpgrep_pat) abort
     " Make sure we didn't find vim's pane
     " TODO this line will break if using manual 'bottom-left', etc. Perhaps
     " come up with a way to normalize pane references??
-    if b:breptile_tmuxpane ==# g:breptile_vimpane
-        let b:breptile_tmuxpane = ''
-    endif
+    " if b:breptile_tmuxpane ==# g:breptile_vimpane
+    "     let b:breptile_tmuxpane = ''
+    " endif
 endfunction
 
 function! s:EscapeText(text) abort 
@@ -186,7 +189,7 @@ function! s:IsValidPane(...)
             let l:pane = ''
         endif
     endif
-    let l:test = ((strlen(l:pane) > 0) && (l:pane !=# g:breptile_vimpane))
+    let l:test = (strlen(l:pane) > 0) " && (l:pane !=# g:breptile_vimpane))
     " TODO test is pane exists in tmux?
     if !l:test
         call s:Warn("WARNING: Pane not set for '" . &filetype . "'. Run BRGetConfig.")
