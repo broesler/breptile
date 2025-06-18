@@ -72,6 +72,7 @@ if g:breptile_mapkeys_matlab "{{{
     nnoremap <silent> <buffer> <localleader>h :BRTmuxSend "help <C-R><C-W>"<CR>
     nnoremap <silent> <buffer> <localleader>w :BRTmuxSend "whodat <C-R><C-W>"<CR>
     nnoremap <silent> <buffer> <localleader>W :BRTmuxSend "whodat"<CR>
+    nnoremap <silent> <buffer> <localleader>f :BRTmuxSend "full(<C-R><C-W>)"<CR>
     " Standard usage:
     " nnoremap <silent> <buffer> <localleader>w :BRTmuxSend "whos <C-R><C-W>"<CR>
     " nnoremap <silent> <buffer> <localleader>W :BRTmuxSend whos<CR>
