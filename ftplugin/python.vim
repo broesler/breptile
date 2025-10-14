@@ -28,7 +28,7 @@ command! -buffer PythonRunTests :call python#PythonRunTests()
 
 if g:breptile_mapkeys_python "{{{
     " Change to current directory
-    nnoremap <buffer> <LocalLeader>d :PythonCd<CR>
+    nnoremap <buffer> <LocalLeader>c :PythonCd<CR>
 
     " Debugging
     nnoremap <buffer> <LocalLeader>b :PythonDbstop<CR>
