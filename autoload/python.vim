@@ -62,8 +62,9 @@ endfunction
 function! python#PythonDbstop()
     " TODO take line number as argument
     " Set a debugging breakpoint for use with pdb
-    let l:pdb = g:breptile_python_interp == 2 ? 'ipdb' : 'pdb'
-    execute 'normal! Oimport ' . l:pdb . '; ' . l:pdb . ".set_trace()j"
+    " let l:pdb = g:breptile_python_interp == 2 ? 'ipdb' : 'pdb'
+    " execute 'normal! Oimport ' . l:pdb . '; ' . l:pdb . ".set_trace()j"
+    execute 'normal! Obreakpoint()j'
 endfunction
 
 function! python#PythonRunTests()
