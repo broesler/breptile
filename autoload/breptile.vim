@@ -81,7 +81,7 @@ function! breptile#TmuxSend(pane, text) abort
         return
     endif
     " Send command NOT literally, do not send carriage return
-    let l:com = "tmux send-keys -t '" . a:pane . "' " . shellescape(a:text)
+    let l:com = ["tmux", "send-keys", "-t", a:pane, a:text]
     call system(l:com)
 endfunction
 
@@ -91,9 +91,12 @@ function! breptile#TmuxSendwithReturn(pane, text) abort
         return
     endif
     " Send command literally, and then send carriage return keystroke
-    let l:litkeys = "tmux send-keys -t '" . a:pane . "' -l " . shellescape(a:text)
-    let l:creturn = "tmux send-keys -t '" . a:pane . "' C-m"
-    call system(l:litkeys . ' && ' . l:creturn)
+    let l:litkeys = ["tmux", "send-keys", "-t", a:pane, "-l", a:text]
+    let l:creturn = ["tmux", "send-keys", "-t", a:pane, "C-m"]
+    call system(l:litkeys)
+    if v:shell_error == 0
+        call system(l:creturn)
+    endif
 endfunction
 
 function! breptile#GetOp(type) abort
@@ -134,17 +137,14 @@ function! s:FindProgramPane(tpgrep_pat) abort
         return
     endif
 
-    " FIXME this line is SUPER SLOW ~0.9s! -- see ChatGPT on lazy loading
-    " and using vim's job control for async processing
     " TODO search with other tmux servers (tmux -L ...), or (tmux -L default)
     " [:-2] strips newline returned by 'system'
     " Get current window ID:
-    let l:tmux_window = trim(system("tmux display-message -p ''#{window_id}''"))
+    let l:tmux_window = trim(system(["tmux", "display-message", "-p", "#{window_id}"]))
 
     " Search within session (remove -s to search within window )
     let l:pat = a:tpgrep_pat
-    let l:syscom = 'tpgrep -s -t ' . l:tmux_window . ' ' . l:pat
-    " FIXME this line is SUPER SLOW ~0.8s!
+    let l:syscom = ['tpgrep', '-s', '-t', l:tmux_window, l:pat]
     let b:breptile_tmuxpane = trim(system(l:syscom))
 
     " Error checking

@@ -76,11 +76,23 @@ function! matlab#debug#Dbstep() "{{{
     "      38      f2 = f(z(:,:,i)+(h/2)*f1);
     "      K>>
     "    and grep for lines starting with numbers, then read last number
-    let lnr = system('tmux capture-pane -p -t ''' . b:breptile_tmuxpane . ''' | grep -o "^\<[0-9]\+\>" | tail -n 1')
+    " TODO test this rewrite
+    " let lnr = system('tmux capture-pane -p -t ''' . b:breptile_tmuxpane . ''' | grep -o "^\<[0-9]\+\>" | tail -n 1')
+    let l:raw_output = system(['tmux', 'capture-pane', '-p', '-t', b:breptile_tmuxpane])
+    let l:lines = split(l:raw_output, "\n")
 
-    " " move cursor to next line, first column with non-whitespace character
-    " call cursor(lnr,0) | norm! ^
-    exe ":silent! sign place 1 line=" . lnr . " name=piet file=" . expand("%:p")
+    call filter(l:lines, 'v:val =~# "^\<\d\+\>"')
+
+    if !empty(l:lines)
+        let l:lnr = l:lines[-1]
+    else
+        echohl WarningMsg | echom "No debugging stop found in MATLAB output." | echohl None
+        return
+    endif
+
+    " move cursor to next line, first column with non-whitespace character
+    " call cursor(l:lnr,0) | norm! ^
+    exe ":silent! sign place 1 line=" . l:lnr . " name=piet file=" . expand("%:p")
 endfunction
 "}}}
 

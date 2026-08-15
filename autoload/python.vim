@@ -114,7 +114,7 @@ function! python#PythonDebug(bang) abort
     endif
 
     cexpr [] " clear the qflist
-    let l:cmd = 'ptb ' . b:breptile_tmuxpane . ' ' . shellescape(b:endpat)
+    let l:cmd = ['ptb', b:breptile_tmuxpane, b:endpat]
     if a:bang
         " If [!] given, fill qflist, but do not jump to first error
         cgetexpr system(l:cmd)
